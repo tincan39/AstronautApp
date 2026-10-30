@@ -1,0 +1,4 @@
+<Solution>
+  <Project Path="api/StargateAPI.csproj" />
+  <Project Path="StargateTestBed/StargateTestBed.csproj" />
+</Solution>
