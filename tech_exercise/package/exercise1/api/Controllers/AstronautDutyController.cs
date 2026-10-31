@@ -8,7 +8,7 @@ using System.Net;
 namespace StargateAPI.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class AstronautDutyController : ControllerBase
     {
         private readonly IMediator _mediator;
