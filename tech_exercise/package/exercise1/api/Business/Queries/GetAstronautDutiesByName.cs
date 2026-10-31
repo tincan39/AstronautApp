@@ -26,7 +26,7 @@ namespace StargateAPI.Business.Queries
 
             var result = new GetAstronautDutiesByNameResult();
 
-            var duties = await _context.AstronautDuties.Include(x => x.Person).Where(x => x.Person.Name == request.Name).ToListAsync();
+            var duties = await _context.AstronautDuties.AsNoTracking().Include(x => x.Person).Where(x => x.Person.Name == request.Name).ToListAsync();
 
             var dutiesDTOs = duties.Select(d => AstronautDutyDTO.FromDuty(d)).ToList();
 

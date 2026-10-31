@@ -1,10 +1,8 @@
-﻿using Dapper;
-using MediatR;
+﻿using MediatR;
 using MediatR.Pipeline;
 using Microsoft.EntityFrameworkCore;
 using StargateAPI.Business.Data;
 using StargateAPI.Controllers;
-using System.Net;
 
 namespace StargateAPI.Business.Commands
 {
@@ -28,17 +26,21 @@ namespace StargateAPI.Business.Commands
             _context = context;
         }
 
-        public Task Process(CreateAstronautDuty request, CancellationToken cancellationToken)
+        public async Task Process(CreateAstronautDuty request, CancellationToken cancellationToken)
         {
-            var person = _context.People.AsNoTracking().FirstOrDefault(z => z.Name == request.Name);
+            if (string.IsNullOrWhiteSpace(request.Name)) throw new BadHttpRequestException("A person's name must be provided");
+            if (string.IsNullOrWhiteSpace(request.Rank)) throw new BadHttpRequestException("The rank field must be filled");
+            if (string.IsNullOrWhiteSpace(request.DutyTitle)) throw new BadHttpRequestException("The duty title field must be filled");
 
-            if (person is null) throw new BadHttpRequestException("Bad Request");
+            if (request.DutyStartDate == default) throw new BadHttpRequestException("A vaild start date must be provided");
 
-            var verifyNoPreviousDuty = _context.AstronautDuties.FirstOrDefault(z => z.DutyTitle == request.DutyTitle && z.DutyStartDate == request.DutyStartDate);
+            var person = await _context.People.AsNoTracking().Include(x => x.AstronautDetail).FirstOrDefaultAsync(z => z.Name == request.Name, cancellationToken);
 
-            if (verifyNoPreviousDuty is not null) throw new BadHttpRequestException("Bad Request");
+            if (person is null) throw new BadHttpRequestException("There is no person with this name");
+            if (person.IsRetired) throw new BadHttpRequestException("Retired Astronauts cannot take on new duties");
 
-            return Task.CompletedTask;
+            var conflictingDuties = await _context.AstronautDuties.Include(x => x.Person).Where(x => request.DutyStartDate.Date <= x.DutyStartDate.Date && x.Person.Name == request.Name).ToListAsync(cancellationToken);
+            if (conflictingDuties.Count != 0) throw new BadHttpRequestException("Astronaut duty must be after all prior duties");
         }
     }
 
@@ -68,7 +70,7 @@ namespace StargateAPI.Business.Commands
             var priorDuty = await _context.AstronautDuties.Where(x => x.PersonId == person.Id && x.DutyEndDate == null).FirstOrDefaultAsync(cancellationToken);
 
             if (priorDuty != null)
-                priorDuty.DutyEndDate = request.DutyStartDate.AddDays(-1).Date;
+                priorDuty.DutyEndDate = request.DutyStartDate.Date.AddDays(-1);
 
             await _context.AstronautDuties.AddAsync(newAstronautDuty, cancellationToken);
 
