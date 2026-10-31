@@ -7,6 +7,7 @@ namespace StargateAPI.Business.Data
     [Table("Person")]
     public class Person
     {
+        private static readonly string RETIRED = "RETIRED";
         public int Id { get; set; }
 
         public string Name { get; set; } = string.Empty;
@@ -14,6 +15,8 @@ namespace StargateAPI.Business.Data
         public virtual AstronautDetail? AstronautDetail { get; set; }
 
         public virtual ICollection<AstronautDuty> AstronautDuties { get; set; } = new HashSet<AstronautDuty>();
+
+        public bool IsRetired => AstronautDetail != null && AstronautDetail.CurrentDutyTitle == RETIRED;
 
         public void CreateOrUpdateAstronautDetails(AstronautDuty duty)
         {
@@ -23,8 +26,6 @@ namespace StargateAPI.Business.Data
                 AstronautDetail.CareerStartDate = duty.DutyStartDate;
                 AstronautDetail.PersonId = duty.PersonId;
             }
-
-            string RETIRED = "RETIRED";
 
             AstronautDetail.CurrentRank = duty.Rank;
             AstronautDetail.CurrentDutyTitle = duty.DutyTitle;
@@ -43,6 +44,7 @@ namespace StargateAPI.Business.Data
             builder.HasKey(x => x.Id);
             builder.Property(x => x.Id).ValueGeneratedOnAdd();
             builder.HasIndex(x => x.Name).IsUnique();
+            builder.Property(x => x.Name).UseCollation("NOCASE");
             builder.HasOne(z => z.AstronautDetail).WithOne(z => z.Person).HasForeignKey<AstronautDetail>(z => z.PersonId);
             builder.HasMany(z => z.AstronautDuties).WithOne(z => z.Person).HasForeignKey(z => z.PersonId);
         }
