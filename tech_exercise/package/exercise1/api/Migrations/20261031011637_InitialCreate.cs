@@ -33,7 +33,7 @@ namespace StargateAPI.Migrations
                     PersonId = table.Column<int>(type: "INTEGER", nullable: false),
                     CurrentRank = table.Column<string>(type: "TEXT", nullable: false),
                     CurrentDutyTitle = table.Column<string>(type: "TEXT", nullable: false),
-                    CareerStartDate = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    CareerStartDate = table.Column<DateTime>(type: "TEXT", nullable: false),
                     CareerEndDate = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
