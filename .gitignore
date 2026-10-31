@@ -430,3 +430,5 @@ FodyWeavers.xsd
 #ignores sqlite db
 starbase.db
 starbase.db-*
+# Serilog file logs
+tech_exercise/package/exercise1/api/logs/

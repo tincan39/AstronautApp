@@ -16,6 +16,8 @@ namespace StargateAPI.Middleware
 
         public async ValueTask<bool> TryHandleAsync(HttpContext httpContext, Exception exception, CancellationToken cancellationToken)
         {
+            _logger.LogError(exception, "Path {Path} has failed: {Message}", httpContext.Request.Path, exception.Message);
+
             int status;
             string detail;
 
@@ -26,7 +28,6 @@ namespace StargateAPI.Middleware
             }
             else
             {
-                _logger.LogError(exception, "Unhandled exception for {Method} {Path}", httpContext.Request.Method, httpContext.Request.Path);
                 status = StatusCodes.Status500InternalServerError;
                 detail = "An error has occurred";
             }
