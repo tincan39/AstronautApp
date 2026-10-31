@@ -22,30 +22,6 @@ namespace StargateAPI.Business.Data
         public DateTime? CareerEndDate { get; set; }
 
         public virtual Person Person { get; set; }
-
-        public void UpdateAstronautDetail(AstronautDuty duty)
-        {
-            PersonId = duty.PersonId;
-            CurrentRank = duty.Rank;
-            CurrentDutyTitle = duty.DutyTitle;
-            if (duty.DutyTitle == RETIRED)
-            {
-                CareerEndDate = duty.DutyStartDate.AddDays(-1);
-            }
-        }
-
-        public static AstronautDetail CreateAstronautDetail(AstronautDuty duty)
-        {
-            var detail = new AstronautDetail
-            {
-                CareerStartDate = duty.DutyStartDate,
-                PersonId = duty.PersonId
-            };
-
-            detail.UpdateAstronautDetail(duty);
-            return detail;
-        }
-
     }
 
     public class AstronautDetailConfiguration : IEntityTypeConfiguration<AstronautDetail>
