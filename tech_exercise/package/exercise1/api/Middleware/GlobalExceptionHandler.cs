@@ -1,4 +1,5 @@
-﻿using Microsoft.AspNetCore.Diagnostics;
+﻿using System.Net;
+using Microsoft.AspNetCore.Diagnostics;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.WebUtilities;
 using StargateAPI.Business.Exceptions;
@@ -28,7 +29,7 @@ namespace StargateAPI.Middleware
             }
             else
             {
-                status = StatusCodes.Status500InternalServerError;
+                status = (int)HttpStatusCode.InternalServerError;
                 detail = "An error has occurred";
             }
 

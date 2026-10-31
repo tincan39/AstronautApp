@@ -24,7 +24,7 @@ namespace StargateAPI.Business.Queries
 
         public async Task<GetPersonByNameResult> Handle(GetPersonByName request, CancellationToken cancellationToken)
         {
-            var person = await _context.People.AsNoTracking().FirstOrDefaultAsync(x => x.Name == request.Name, cancellationToken);
+            var person = await _context.People.AsNoTracking().Include(x => x.AstronautDetail).FirstOrDefaultAsync(x => x.Name == request.Name, cancellationToken);
             if (person is null)
                 throw new ClientException(HttpStatusCode.NotFound, "There is no Person with this name");
 

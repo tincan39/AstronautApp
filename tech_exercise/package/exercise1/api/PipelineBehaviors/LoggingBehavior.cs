@@ -4,11 +4,6 @@ using System.Diagnostics;
 
 namespace StargateAPI.PipelineBehaviors
 {
-    /// <summary>
-    /// Records every MediatR request in the Logs table: success or error, elapsed time,
-    /// and the exception details on failure. Registered as the outermost behavior in Program.cs,
-    /// so it also catches exceptions thrown by request pre-processors.
-    /// </summary>
     public class LoggingBehavior<TRequest, TResponse> : IPipelineBehavior<TRequest, TResponse> where TRequest : notnull
     {
         private readonly ILogger<LoggingBehavior<TRequest, TResponse>> _logger;
