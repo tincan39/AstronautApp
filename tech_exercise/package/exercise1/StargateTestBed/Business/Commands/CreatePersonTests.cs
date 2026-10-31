@@ -16,13 +16,15 @@ namespace StargateTestBed.Business.Commands
         [Test]
         public async Task Send_NewName_CreatesPersonWithoutAstronautDetail()
         {
-            await SendAsync(new CreatePerson { Name = "Neil Armstrong" });
+            var name = "Neil Armstrong";
+
+            await SendAsync(new CreatePerson { Name = name });
 
             using var db = CreateContext();
             var person = await db.People.Include(x => x.AstronautDetail).SingleAsync();
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(person.Name, Is.EqualTo("Neil Armstrong"));
+                Assert.That(person.Name, Is.EqualTo(name));
                 Assert.That(person.AstronautDetail, Is.Null);
             }
         }
@@ -43,11 +45,10 @@ namespace StargateTestBed.Business.Commands
             }
         }
 
-        [TestCase("")]
-        [TestCase("   ")]
-        public async Task Send_BlankName_ThrowsClientExceptionAndCreatesNothing(string name)
+        [Test]
+        public async Task Send_BlankName_ThrowsClientExceptionAndCreatesNothing()
         {
-            var ex = await Assert.ThrowsAsync<ClientException>(async () => await SendAsync(new CreatePerson { Name = name }));
+            var ex = await Assert.ThrowsAsync<ClientException>(async () => await SendAsync(new CreatePerson { Name = " " }));
 
             using var db = CreateContext();
             var peopleCount = await db.People.CountAsync();

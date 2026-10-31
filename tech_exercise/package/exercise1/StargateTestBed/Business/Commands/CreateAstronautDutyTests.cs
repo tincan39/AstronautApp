@@ -32,9 +32,12 @@ namespace StargateTestBed.Business.Commands
         [Test]
         public async Task Send_FirstDuty_CreatesOpenDutyAndAstronautDetail()
         {
-            await SeedPersonAsync("Sally Ride");
+            var name = "Sally Ride";
+            var rank = "1LT";
+            var title = "Pilot";
+            await SeedPersonAsync(name);
 
-            await SendAsync(Duty("Sally Ride", "1LT", "Pilot", FirstStart));
+            await SendAsync(Duty(name, rank, title, FirstStart));
 
             using var db = CreateContext();
             var person = await db.People.Include(x => x.AstronautDetail).Include(x => x.AstronautDuties).SingleAsync();
@@ -42,13 +45,13 @@ namespace StargateTestBed.Business.Commands
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(person.AstronautDetail, Is.Not.Null);
-                Assert.That(duty.Rank, Is.EqualTo("1LT"));
-                Assert.That(duty.DutyTitle, Is.EqualTo("Pilot"));
+                Assert.That(duty.Rank, Is.EqualTo(rank));
+                Assert.That(duty.DutyTitle, Is.EqualTo(title));
                 Assert.That(duty.DutyStartDate, Is.EqualTo(FirstStart));
                 Assert.That(duty.DutyEndDate, Is.Null);
 
-                Assert.That(person.AstronautDetail!.CurrentRank, Is.EqualTo("1LT"));
-                Assert.That(person.AstronautDetail.CurrentDutyTitle, Is.EqualTo("Pilot"));
+                Assert.That(person.AstronautDetail!.CurrentRank, Is.EqualTo(rank));
+                Assert.That(person.AstronautDetail.CurrentDutyTitle, Is.EqualTo(title));
                 Assert.That(person.AstronautDetail.CareerStartDate, Is.EqualTo(FirstStart));
                 Assert.That(person.AstronautDetail.CareerEndDate, Is.Null);
             }
@@ -57,22 +60,26 @@ namespace StargateTestBed.Business.Commands
         [Test]
         public async Task Send_SecondDuty_ClosesPriorDutyAndUpdatesDetail()
         {
-            await SeedPersonAsync("Sally Ride");
-            await SendAsync(Duty("Sally Ride", "1LT", "Pilot", FirstStart));
+            var name = "Sally Ride";
+            var priorTitle = "Pilot";
+            var currentRank = "CPT";
+            var currentTitle = "Commander";
+            await SeedPersonAsync(name);
+            await SendAsync(Duty(name, "1LT", priorTitle, FirstStart));
 
-            await SendAsync(Duty("Sally Ride", "CPT", "Commander", SecondStart));
+            await SendAsync(Duty(name, currentRank, currentTitle, SecondStart));
 
             using var db = CreateContext();
             var person = await db.People.Include(x => x.AstronautDetail).Include(x => x.AstronautDuties).SingleAsync();
-            var prior = person.AstronautDuties.Single(x => x.DutyTitle == "Pilot");
-            var current = person.AstronautDuties.Single(x => x.DutyTitle == "Commander");
+            var prior = person.AstronautDuties.Single(x => x.DutyTitle == priorTitle);
+            var current = person.AstronautDuties.Single(x => x.DutyTitle == currentTitle);
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(prior.DutyEndDate, Is.EqualTo(SecondStart.AddDays(-1)));
                 Assert.That(current.DutyEndDate, Is.Null);
 
-                Assert.That(person.AstronautDetail!.CurrentRank, Is.EqualTo("CPT"));
-                Assert.That(person.AstronautDetail.CurrentDutyTitle, Is.EqualTo("Commander"));
+                Assert.That(person.AstronautDetail!.CurrentRank, Is.EqualTo(currentRank));
+                Assert.That(person.AstronautDetail.CurrentDutyTitle, Is.EqualTo(currentTitle));
                 Assert.That(person.AstronautDetail.CareerStartDate, Is.EqualTo(FirstStart));
             }
         }
@@ -80,16 +87,18 @@ namespace StargateTestBed.Business.Commands
         [Test]
         public async Task Send_RetiredDuty_SetsCareerEndDateToDayBeforeRetirement()
         {
-            await SeedPersonAsync("Sally Ride");
-            await SendAsync(Duty("Sally Ride", "1LT", "Pilot", FirstStart));
+            var name = "Sally Ride";
+            var retired = "RETIRED";
+            await SeedPersonAsync(name);
+            await SendAsync(Duty(name, "1LT", "Pilot", FirstStart));
 
-            await SendAsync(Duty("Sally Ride", "CPT", "RETIRED", SecondStart));
+            await SendAsync(Duty(name, "CPT", retired, SecondStart));
 
             using var db = CreateContext();
             var detail = await db.AstronautDetails.SingleAsync();
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(detail.CurrentDutyTitle, Is.EqualTo("RETIRED"));
+                Assert.That(detail.CurrentDutyTitle, Is.EqualTo(retired));
                 Assert.That(detail.CareerEndDate, Is.EqualTo(SecondStart.AddDays(-1)));
             }
         }
@@ -105,16 +114,18 @@ namespace StargateTestBed.Business.Commands
         [Test]
         public async Task Send_RetiredPerson_ThrowsBadRequest()
         {
-            await SeedPersonAsync("John Glenn", new AstronautDetail
+            var name = "John Glenn";
+            var rank = "COL";
+            await SeedPersonAsync(name, new AstronautDetail
             {
-                CurrentRank = "COL",
+                CurrentRank = rank,
                 CurrentDutyTitle = "RETIRED",
                 CareerStartDate = FirstStart,
                 CareerEndDate = SecondStart
             });
 
             var ex = await Assert.ThrowsAsync<ClientException>(async () =>
-                await SendAsync(Duty("John Glenn", "COL", "Commander", SecondStart.AddYears(1))));
+                await SendAsync(Duty(name, rank, "Commander", SecondStart.AddYears(1))));
 
             AssertClientException(ex, HttpStatusCode.BadRequest, "Retired Astronauts cannot take on new duties");
         }
@@ -123,18 +134,20 @@ namespace StargateTestBed.Business.Commands
         [TestCase(-30)]
         public async Task Send_StartNotAfterExistingDuty_ThrowsAndLeavesExistingDutyUnchanged(int daysFromExistingStart)
         {
-            await SeedPersonAsync("Sally Ride");
-            await SendAsync(Duty("Sally Ride", "1LT", "Pilot", SecondStart));
+            var name = "Sally Ride";
+            var existingTitle = "Pilot";
+            await SeedPersonAsync(name);
+            await SendAsync(Duty(name, "1LT", existingTitle, SecondStart));
 
             var ex = await Assert.ThrowsAsync<ClientException>(async () =>
-                await SendAsync(Duty("Sally Ride", "CPT", "Commander", SecondStart.AddDays(daysFromExistingStart))));
+                await SendAsync(Duty(name, "CPT", "Commander", SecondStart.AddDays(daysFromExistingStart))));
 
             AssertClientException(ex, HttpStatusCode.BadRequest, "Astronaut duty must be after all prior duties");
             using var db = CreateContext();
             var duty = await db.AstronautDuties.SingleAsync();
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(duty.DutyTitle, Is.EqualTo("Pilot"));
+                Assert.That(duty.DutyTitle, Is.EqualTo(existingTitle));
                 Assert.That(duty.DutyEndDate, Is.Null);
             }
         }
@@ -142,9 +155,10 @@ namespace StargateTestBed.Business.Commands
         [Test]
         public async Task Send_BlankRank_ThrowsBadRequest()
         {
-            await SeedPersonAsync("Sally Ride");
+            var name = "Sally Ride";
+            await SeedPersonAsync(name);
 
-            var ex = await Assert.ThrowsAsync<ClientException>(async () => await SendAsync(Duty("Sally Ride", " ", "Pilot", FirstStart)));
+            var ex = await Assert.ThrowsAsync<ClientException>(async () => await SendAsync(Duty(name, " ", "Pilot", FirstStart)));
 
             AssertClientException(ex, HttpStatusCode.BadRequest, "The rank field must be filled");
         }

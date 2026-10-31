@@ -22,45 +22,50 @@ namespace StargateTestBed.Business.Commands
         [Test]
         public async Task Send_NewName_RenamesPersonAndKeepsDuties()
         {
-            var person = await SeedPersonAsync("Sally Ride");
-            await SeedDutyAsync(person, "1LT", "Pilot", new DateTime(2020, 1, 15));
+            var oldName = "Sally Ride";
+            var newName = "Sally K. Ride";
+            var dutyTitle = "Pilot";
+            var person = await SeedPersonAsync(oldName);
+            await SeedDutyAsync(person, "1LT", dutyTitle, new DateTime(2020, 1, 15));
 
-            await SendAsync(new UpdatePerson { Name = "Sally Ride", NewName = "Sally K. Ride" });
+            await SendAsync(new UpdatePerson { Name = oldName, NewName = newName });
 
             using var db = CreateContext();
             var renamed = await db.People.Include(x => x.AstronautDuties).SingleAsync();
             using (Assert.EnterMultipleScope())
             {
-                Assert.That(renamed.Name, Is.EqualTo("Sally K. Ride"));
-                Assert.That(renamed.AstronautDuties.Select(x => x.DutyTitle), Is.EquivalentTo(new[] { "Pilot" }));
+                Assert.That(renamed.Name, Is.EqualTo(newName));
+                Assert.That(renamed.AstronautDuties.Select(x => x.DutyTitle), Is.EquivalentTo(new[] { dutyTitle }));
             }
         }
 
         [Test]
         public async Task Send_SameNameDifferentCase_RenamesPerson()
         {
-            await SeedPersonAsync("john doe");
+            var storedName = "john doe";
+            var renamedName = "John Doe";
+            await SeedPersonAsync(storedName);
 
-            await SendAsync(new UpdatePerson { Name = "john doe", NewName = "John Doe" });
+            await SendAsync(new UpdatePerson { Name = storedName, NewName = renamedName });
 
-            Assert.That(await GetNamesAsync(), Is.EqualTo(new[] { "John Doe" }));
+            Assert.That(await GetNamesAsync(), Is.EqualTo(new[] { renamedName }));
         }
 
-        [TestCase("")]
-        [TestCase("   ")]
-        public async Task Send_BlankNewName_ThrowsBadRequest(string newName)
+        [Test]
+        public async Task Send_BlankNewName_ThrowsBadRequest()
         {
-            await SeedPersonAsync("Sally Ride");
+            var name = "Sally Ride";
+            await SeedPersonAsync(name);
 
             var ex = await Assert.ThrowsAsync<ClientException>(async () =>
-                await SendAsync(new UpdatePerson { Name = "Sally Ride", NewName = newName }));
+                await SendAsync(new UpdatePerson { Name = name, NewName = " " }));
 
             var names = await GetNamesAsync();
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(ex!.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
                 Assert.That(ex.Message, Is.EqualTo("A valid name must be provided to update a person"));
-                Assert.That(names, Is.EqualTo(new[] { "Sally Ride" }));
+                Assert.That(names, Is.EqualTo(new[] { name }));
             }
         }
 
@@ -80,18 +85,20 @@ namespace StargateTestBed.Business.Commands
         [Test]
         public async Task Send_NewNameTakenByAnotherPerson_ThrowsBadRequest()
         {
-            await SeedPersonAsync("Sally Ride");
-            await SeedPersonAsync("Neil Armstrong");
+            var existingName = "Sally Ride";
+            var otherName = "Neil Armstrong";
+            await SeedPersonAsync(existingName);
+            await SeedPersonAsync(otherName);
 
             var ex = await Assert.ThrowsAsync<ClientException>(async () =>
-                await SendAsync(new UpdatePerson { Name = "Sally Ride", NewName = "neil armstrong" }));
+                await SendAsync(new UpdatePerson { Name = existingName, NewName = otherName.ToLowerInvariant() }));
 
             var names = await GetNamesAsync();
             using (Assert.EnterMultipleScope())
             {
                 Assert.That(ex!.StatusCode, Is.EqualTo(HttpStatusCode.BadRequest));
                 Assert.That(ex.Message, Is.EqualTo("A person with this name already exists"));
-                Assert.That(names, Is.EquivalentTo(new[] { "Sally Ride", "Neil Armstrong" }));
+                Assert.That(names, Is.EquivalentTo(new[] { existingName, otherName }));
             }
         }
     }

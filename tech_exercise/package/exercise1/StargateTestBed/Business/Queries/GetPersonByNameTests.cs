@@ -13,26 +13,28 @@ namespace StargateTestBed.Business.Queries
         [Test]
         public async Task Handle_ExistingName_ReturnsPerson()
         {
-            await SeedPersonAsync("Neil Armstrong");
+            var name = "Neil Armstrong";
+            await SeedPersonAsync(name);
 
-            var result = await SendAsync("Neil Armstrong");
+            var result = await SendAsync(name);
 
-            Assert.That(result.Person!.Name, Is.EqualTo("Neil Armstrong"));
+            Assert.That(result.Person!.Name, Is.EqualTo(name));
         }
 
         [Test]
         public async Task Handle_AstronautLookedUpWithDifferentCase_ReturnsAstronautDetail()
         {
+            var rank = "CPT";
             await SeedPersonAsync("Sally Ride", new AstronautDetail
             {
-                CurrentRank = "CPT",
+                CurrentRank = rank,
                 CurrentDutyTitle = "Commander",
                 CareerStartDate = new DateTime(2020, 1, 15)
             });
 
             var result = await SendAsync("sally ride");
 
-            Assert.That(result.Person!.CurrentRank, Is.EqualTo("CPT"));
+            Assert.That(result.Person!.CurrentRank, Is.EqualTo(rank));
         }
 
         [Test]

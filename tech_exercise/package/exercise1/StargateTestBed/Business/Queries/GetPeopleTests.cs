@@ -11,8 +11,10 @@ namespace StargateTestBed.Business.Queries
         [Test]
         public async Task Handle_PeopleExist_ReturnsEveryPerson()
         {
-            await SeedPersonAsync("Neil Armstrong");
-            await SeedPersonAsync("Sally Ride", new AstronautDetail
+            var civilianName = "Neil Armstrong";
+            var astronautName = "Sally Ride";
+            await SeedPersonAsync(civilianName);
+            await SeedPersonAsync(astronautName, new AstronautDetail
             {
                 CurrentRank = "CPT",
                 CurrentDutyTitle = "Commander",
@@ -21,7 +23,7 @@ namespace StargateTestBed.Business.Queries
 
             var result = await SendAsync();
 
-            Assert.That(result.People.Select(x => x.Name), Is.EquivalentTo(new[] { "Neil Armstrong", "Sally Ride" }));
+            Assert.That(result.People.Select(x => x.Name), Is.EquivalentTo(new[] { civilianName, astronautName }));
         }
 
         [Test]

@@ -10,15 +10,20 @@ namespace StargateTestBed.Business.Queries
         [Test]
         public async Task Handle_PersonWithDuties_ReturnsOnlyThatPersonsDuties()
         {
-            var sally = await SeedPersonAsync("Sally Ride");
+            var name = "Sally Ride";
+            var pilotTitle = "Pilot";
+            var commanderTitle = "Commander";
+            var careerStart = new DateTime(2020, 1, 15);
+            var commanderStart = new DateTime(2022, 6, 1);
+            var sally = await SeedPersonAsync(name);
             var neil = await SeedPersonAsync("Neil Armstrong");
-            await SeedDutyAsync(sally, "1LT", "Pilot", new DateTime(2020, 1, 15), new DateTime(2022, 5, 31));
-            await SeedDutyAsync(sally, "CPT", "Commander", new DateTime(2022, 6, 1));
-            await SeedDutyAsync(neil, "MAJ", "Engineer", new DateTime(2020, 1, 15));
+            await SeedDutyAsync(sally, "1LT", pilotTitle, careerStart, commanderStart.AddDays(-1));
+            await SeedDutyAsync(sally, "CPT", commanderTitle, commanderStart);
+            await SeedDutyAsync(neil, "MAJ", "Engineer", careerStart);
 
-            var result = await SendAsync("Sally Ride");
+            var result = await SendAsync(name);
 
-            Assert.That(result.AstronautDuties.Select(x => x.DutyTitle), Is.EquivalentTo(new[] { "Pilot", "Commander" }));
+            Assert.That(result.AstronautDuties.Select(x => x.DutyTitle), Is.EquivalentTo(new[] { pilotTitle, commanderTitle }));
         }
 
         [Test]
