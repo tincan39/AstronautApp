@@ -36,6 +36,7 @@ builder.Services.AddMediatR(cfg =>
 });
 builder.Services.AddTransient<IRequestPreProcessor<CreatePerson>, CreatePersonPreProcessor>();
 builder.Services.AddTransient<IRequestPreProcessor<CreateAstronautDuty>, CreateAstronautDutyPreProcessor>();
+builder.Services.AddTransient<IRequestPreProcessor<UpdatePerson>, UpdatePersonPreProcessor>();
 
 var app = builder.Build();
 app.UseExceptionHandler();

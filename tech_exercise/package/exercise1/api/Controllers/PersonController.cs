@@ -45,5 +45,16 @@ namespace StargateAPI.Controllers
             }, cancellationToken);
             return Ok();
         }
+
+        [HttpPut("{name}")]
+        public async Task<IActionResult> UpdatePerson(string name, [FromBody] UpdatePersonRequest request, CancellationToken cancellationToken)
+        {
+            await _mediator.Send(new UpdatePerson()
+            {
+                Name = name,
+                NewName = request.Name
+            }, cancellationToken);
+            return Ok();
+        }
     }
 }
