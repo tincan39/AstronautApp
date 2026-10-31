@@ -15,6 +15,25 @@ namespace StargateAPI.Business.Data
 
         public virtual ICollection<AstronautDuty> AstronautDuties { get; set; } = new HashSet<AstronautDuty>();
 
+        public void CreateOrUpdateAstronautDetails(AstronautDuty duty)
+        {
+            if(AstronautDetail == null)
+            {
+                AstronautDetail = new AstronautDetail();
+                AstronautDetail.CareerStartDate = duty.DutyStartDate;
+                AstronautDetail.PersonId = duty.PersonId;
+            }
+
+            string RETIRED = "RETIRED";
+
+            AstronautDetail.CurrentRank = duty.Rank;
+            AstronautDetail.CurrentDutyTitle = duty.DutyTitle;
+            if (duty.DutyTitle == RETIRED)
+            {
+                AstronautDetail.CareerEndDate = duty.DutyStartDate.AddDays(-1);
+            }
+        }
+
     }
 
     public class PersonConfiguration : IEntityTypeConfiguration<Person>
