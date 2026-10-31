@@ -2,11 +2,13 @@
 using MediatR.Pipeline;
 using Microsoft.EntityFrameworkCore;
 using StargateAPI.Business.Data;
+using StargateAPI.Business.Exceptions;
 using StargateAPI.Controllers;
+using System.Net;
 
 namespace StargateAPI.Business.Commands
 {
-    public class CreateAstronautDuty : IRequest<CreateAstronautDutyResult>
+    public class CreateAstronautDuty : IRequest
     {
         public required string Name { get; set; }
 
@@ -28,23 +30,23 @@ namespace StargateAPI.Business.Commands
 
         public async Task Process(CreateAstronautDuty request, CancellationToken cancellationToken)
         {
-            if (string.IsNullOrWhiteSpace(request.Name)) throw new BadHttpRequestException("A person's name must be provided");
-            if (string.IsNullOrWhiteSpace(request.Rank)) throw new BadHttpRequestException("The rank field must be filled");
-            if (string.IsNullOrWhiteSpace(request.DutyTitle)) throw new BadHttpRequestException("The duty title field must be filled");
+            if (string.IsNullOrWhiteSpace(request.Name)) throw new ClientException("A person's name must be provided");
+            if (string.IsNullOrWhiteSpace(request.Rank)) throw new ClientException("The rank field must be filled");
+            if (string.IsNullOrWhiteSpace(request.DutyTitle)) throw new ClientException("The duty title field must be filled");
 
-            if (request.DutyStartDate == default) throw new BadHttpRequestException("A vaild start date must be provided");
+            if (request.DutyStartDate == default) throw new ClientException("A valid start date must be provided");
 
             var person = await _context.People.AsNoTracking().Include(x => x.AstronautDetail).FirstOrDefaultAsync(z => z.Name == request.Name, cancellationToken);
 
-            if (person is null) throw new BadHttpRequestException("There is no person with this name");
-            if (person.IsRetired) throw new BadHttpRequestException("Retired Astronauts cannot take on new duties");
+            if (person is null) throw new ClientException(HttpStatusCode.NotFound, "There is no person with this name");
+            if (person.IsRetired) throw new ClientException("Retired Astronauts cannot take on new duties");
 
             var conflictingDuties = await _context.AstronautDuties.Include(x => x.Person).Where(x => request.DutyStartDate.Date <= x.DutyStartDate.Date && x.Person.Name == request.Name).ToListAsync(cancellationToken);
-            if (conflictingDuties.Count != 0) throw new BadHttpRequestException("Astronaut duty must be after all prior duties");
+            if (conflictingDuties.Count != 0) throw new ClientException("Astronaut duty must be after all prior duties");
         }
     }
 
-    public class CreateAstronautDutyHandler : IRequestHandler<CreateAstronautDuty, CreateAstronautDutyResult>
+    public class CreateAstronautDutyHandler : IRequestHandler<CreateAstronautDuty>
     {
         private readonly StargateContext _context;
 
@@ -52,7 +54,7 @@ namespace StargateAPI.Business.Commands
         {
             _context = context;
         }
-        public async Task<CreateAstronautDutyResult> Handle(CreateAstronautDuty request, CancellationToken cancellationToken)
+        public async Task Handle(CreateAstronautDuty request, CancellationToken cancellationToken)
         {
             var person = await _context.People.Include(x => x.AstronautDetail).FirstOrDefaultAsync(x => x.Name == request.Name, cancellationToken);
 
@@ -75,16 +77,6 @@ namespace StargateAPI.Business.Commands
             await _context.AstronautDuties.AddAsync(newAstronautDuty, cancellationToken);
 
             await _context.SaveChangesAsync(cancellationToken);
-
-            return new CreateAstronautDutyResult()
-            {
-                Id = newAstronautDuty.Id
-            };
         }
-    }
-
-    public class CreateAstronautDutyResult : BaseResponse
-    {
-        public int? Id { get; set; }
     }
 }

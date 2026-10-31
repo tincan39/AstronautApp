@@ -35,7 +35,7 @@ namespace StargateAPI.Business.Queries
         }
     }
 
-    public class GetAstronautDutiesByNameResult : BaseResponse
+    public class GetAstronautDutiesByNameResult
     {
         public string AstronautName { get; set; } = string.Empty;
         public List<AstronautDutyDTO> AstronautDuties { get; set; } = new List<AstronautDutyDTO>();

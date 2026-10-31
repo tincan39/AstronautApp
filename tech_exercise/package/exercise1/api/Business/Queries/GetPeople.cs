@@ -28,7 +28,7 @@ namespace StargateAPI.Business.Queries
         }
     }
 
-    public class GetPeopleResult : BaseResponse
+    public class GetPeopleResult
     {
         public GetPeopleResult() { }
 

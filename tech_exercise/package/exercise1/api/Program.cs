@@ -1,12 +1,14 @@
 using Microsoft.EntityFrameworkCore;
 using StargateAPI.Business.Commands;
 using StargateAPI.Business.Data;
+using StargateAPI.Middleware;
 using StargateAPI.PipelineBehaviors;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
-
+builder.Services.AddProblemDetails();
+builder.Services.AddExceptionHandler<GlobalExceptionHandler>();
 builder.Services.AddControllers();
 // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
 builder.Services.AddEndpointsApiExplorer();
@@ -23,6 +25,7 @@ builder.Services.AddMediatR(cfg =>
 });
 
 var app = builder.Build();
+app.UseExceptionHandler();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())

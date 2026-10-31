@@ -20,71 +20,30 @@ namespace StargateAPI.Controllers
         [HttpGet("")]
         public async Task<IActionResult> GetPeople()
         {
-            try
-            {
-                var result = await _mediator.Send(new GetPeople()
-                {
+            var result = await _mediator.Send(new GetPeople());
 
-                });
-
-                return this.GetResponse(result);
-            }
-            catch (Exception ex)
-            {
-                return this.GetResponse(new BaseResponse()
-                {
-                    Message = ex.Message,
-                    Success = false,
-                    ResponseCode = (int)HttpStatusCode.InternalServerError
-                });
-            }
+            return Ok(result);
         }
 
         [HttpGet("{name}")]
         public async Task<IActionResult> GetPersonByName(string name)
         {
-            try
+            var result = await _mediator.Send(new GetPersonByName()
             {
-                var result = await _mediator.Send(new GetPersonByName()
-                {
-                    Name = name
-                });
+                Name = name
+            });
 
-                return this.GetResponse(result);
-            }
-            catch (Exception ex)
-            {
-                return this.GetResponse(new BaseResponse()
-                {
-                    Message = ex.Message,
-                    Success = false,
-                    ResponseCode = (int)HttpStatusCode.InternalServerError
-                });
-            }
+            return Ok(result);
         }
 
         [HttpPost("")]
         public async Task<IActionResult> CreatePerson([FromBody] string name)
-        {
-            try
+        {     
+            await _mediator.Send(new CreatePerson()
             {
-                var result = await _mediator.Send(new CreatePerson()
-                {
-                    Name = name
-                });
-
-                return this.GetResponse(result);
-            }
-            catch (Exception ex)
-            {
-                return this.GetResponse(new BaseResponse()
-                {
-                    Message = ex.Message,
-                    Success = false,
-                    ResponseCode = (int)HttpStatusCode.InternalServerError
-                });
-            }
-
+                Name = name
+            });
+            return Ok();
         }
     }
 }

@@ -3,7 +3,9 @@ using MediatR;
 using Microsoft.EntityFrameworkCore;
 using StargateAPI.Business.Data;
 using StargateAPI.Business.Dtos;
+using StargateAPI.Business.Exceptions;
 using StargateAPI.Controllers;
+using System.Net;
 
 namespace StargateAPI.Business.Queries
 {
@@ -22,15 +24,15 @@ namespace StargateAPI.Business.Queries
 
         public async Task<GetPersonByNameResult> Handle(GetPersonByName request, CancellationToken cancellationToken)
         {
-            var person = await _context.People.AsNoTracking().FirstOrDefaultAsync(x => x.Name == request.Name);
+            var person = await _context.People.AsNoTracking().FirstOrDefaultAsync(x => x.Name == request.Name, cancellationToken);
             if (person is null)
-                throw new BadHttpRequestException("There is no Person with this name");
+                throw new ClientException(HttpStatusCode.NotFound, "There is no Person with this name");
 
             return new GetPersonByNameResult(PersonDTO.FromPerson(person));
         }
     }
 
-    public class GetPersonByNameResult : BaseResponse
+    public class GetPersonByNameResult
     {
         public PersonDTO? Person { get; set; }
 
