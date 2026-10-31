@@ -18,31 +18,31 @@ namespace StargateAPI.Controllers
         }
 
         [HttpGet("")]
-        public async Task<IActionResult> GetPeople()
+        public async Task<IActionResult> GetPeople(CancellationToken cancellationToken)
         {
-            var result = await _mediator.Send(new GetPeople());
+            var result = await _mediator.Send(new GetPeople(), cancellationToken);
 
             return Ok(result);
         }
 
         [HttpGet("{name}")]
-        public async Task<IActionResult> GetPersonByName(string name)
+        public async Task<IActionResult> GetPersonByName(string name, CancellationToken cancellationToken)
         {
             var result = await _mediator.Send(new GetPersonByName()
             {
                 Name = name
-            });
+            }, cancellationToken);
 
             return Ok(result);
         }
 
         [HttpPost("")]
-        public async Task<IActionResult> CreatePerson([FromBody] string name)
-        {     
+        public async Task<IActionResult> CreatePerson([FromBody] string name, CancellationToken cancellationToken)
+        {
             await _mediator.Send(new CreatePerson()
             {
                 Name = name
-            });
+            }, cancellationToken);
             return Ok();
         }
     }

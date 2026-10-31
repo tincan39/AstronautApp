@@ -23,28 +23,13 @@ namespace StargateAPI.Business.Queries
 
         public async Task<GetAstronautDutiesByNameResult> Handle(GetAstronautDutiesByName request, CancellationToken cancellationToken)
         {
-
-            var result = new GetAstronautDutiesByNameResult();
-
-            var duties = await _context.AstronautDuties.AsNoTracking().Include(x => x.Person).Where(x => x.Person.Name == request.Name).ToListAsync();
+            var duties = await _context.AstronautDuties.AsNoTracking().Include(x => x.Person).Where(x => x.Person.Name == request.Name).ToListAsync(cancellationToken);
 
             var dutiesDTOs = duties.Select(d => AstronautDutyDTO.FromDuty(d)).ToList();
 
             return new GetAstronautDutiesByNameResult(request.Name, dutiesDTOs);
-
         }
     }
 
-    public class GetAstronautDutiesByNameResult
-    {
-        public string AstronautName { get; set; } = string.Empty;
-        public List<AstronautDutyDTO> AstronautDuties { get; set; } = new List<AstronautDutyDTO>();
-
-        public GetAstronautDutiesByNameResult() { }
-        public GetAstronautDutiesByNameResult(string astronautName, List<AstronautDutyDTO> astronautDuties)
-        {
-            AstronautName = astronautName;
-            AstronautDuties = astronautDuties;
-        }
-    }
+    public record GetAstronautDutiesByNameResult(string AstronautName, List<AstronautDutyDTO> AstronautDuties);
 }

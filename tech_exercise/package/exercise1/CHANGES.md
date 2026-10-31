@@ -13,10 +13,12 @@
 - Corrected GetAstronautDutiesByName sending the wrong request to mediatr
 - removed the redundant try/catch blocks scattered throughout controllers. GlobalExceptionHandler replaces them
 - removed controllerbase extensions after removing BaseResponse
+- propagated cancellation tokens down to the mediatr level
 
 ## dtos
 - removed BaseReponse since that information would be handled by the GlobalExceptionHandler class I've made which would format and handle error
 - removed PersonId from PersonDTO(which was renamed from PersonAstronaut) since letting the user know the integer primary key is security risk
+- convert class dtos to records
 
 ## logging
 - uses ef core for db logs

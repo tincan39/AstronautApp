@@ -32,13 +32,5 @@ namespace StargateAPI.Business.Queries
         }
     }
 
-    public class GetPersonByNameResult
-    {
-        public PersonDTO? Person { get; set; }
-
-        public GetPersonByNameResult(PersonDTO person)
-        {
-            this.Person = person;
-        }
-    }
+    public record GetPersonByNameResult(PersonDTO Person);
 }
