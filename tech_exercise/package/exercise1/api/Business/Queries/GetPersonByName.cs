@@ -22,16 +22,19 @@ namespace StargateAPI.Business.Queries
 
         public async Task<GetPersonByNameResult> Handle(GetPersonByName request, CancellationToken cancellationToken)
         {
-            var person = await _context.People.FirstOrDefaultAsync(x => x.Name == request.Name);
-            return new GetPersonByNameResult(PersonAstronaut.FromPerson(person));
+            var person = await _context.People.AsNoTracking().FirstOrDefaultAsync(x => x.Name == request.Name);
+            if (person is null)
+                throw new BadHttpRequestException("There is no Person with this name");
+
+            return new GetPersonByNameResult(PersonDTO.FromPerson(person));
         }
     }
 
     public class GetPersonByNameResult : BaseResponse
     {
-        public PersonAstronaut? Person { get; set; }
+        public PersonDTO? Person { get; set; }
 
-        public GetPersonByNameResult(PersonAstronaut person)
+        public GetPersonByNameResult(PersonDTO person)
         {
             this.Person = person;
         }

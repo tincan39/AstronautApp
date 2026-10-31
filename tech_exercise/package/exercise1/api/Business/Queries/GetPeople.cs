@@ -22,7 +22,8 @@ namespace StargateAPI.Business.Queries
         public async Task<GetPeopleResult> Handle(GetPeople request, CancellationToken cancellationToken)
         {
             var result = new GetPeopleResult();
-            var people = await _context.People.Include(x => x.AstronautDetail).Select(x => PersonAstronaut.FromPerson(x)).ToListAsync(cancellationToken);
+            var people = await _context.People.AsNoTracking().Include(x => x.AstronautDetail).
+                Select(x => PersonDTO.FromPerson(x)).ToListAsync(cancellationToken);
             return new GetPeopleResult(people) ;
         }
     }
@@ -31,12 +32,12 @@ namespace StargateAPI.Business.Queries
     {
         public GetPeopleResult() { }
 
-        public GetPeopleResult(List<PersonAstronaut> people)
+        public GetPeopleResult(List<PersonDTO> people)
         {
             People = people;
         }
 
-        public List<PersonAstronaut> People { get; set; } = new List<PersonAstronaut> { };
+        public List<PersonDTO> People { get; set; } = new List<PersonDTO> { };
 
     }
 }

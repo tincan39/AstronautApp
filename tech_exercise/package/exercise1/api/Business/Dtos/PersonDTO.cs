@@ -2,10 +2,8 @@
 
 namespace StargateAPI.Business.Dtos
 {
-    public class PersonAstronaut
+    public class PersonDTO
     {
-        public int PersonId { get; set; }
-
         public string Name { get; set; } = string.Empty;
 
         public string CurrentRank { get; set; } = string.Empty;
@@ -17,9 +15,9 @@ namespace StargateAPI.Business.Dtos
         public DateTime? CareerEndDate { get; set; }
 
         // Requires person.AstronautDetail to be loaded (e.g. via Include).
-        public static PersonAstronaut FromPerson(Person person)
+        public static PersonDTO FromPerson(Person person)
         {
-            return new PersonAstronaut
+            return new PersonDTO
             {
                 Name = person.Name,
                 CurrentRank = person.AstronautDetail?.CurrentRank ?? string.Empty,
