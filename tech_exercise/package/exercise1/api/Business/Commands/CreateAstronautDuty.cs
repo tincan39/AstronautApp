@@ -65,7 +65,7 @@ namespace StargateAPI.Business.Commands
 
             person.CreateOrUpdateAstronautDetails(newAstronautDuty);
 
-            var priorDuty = await _context.AstronautDuties.Where(x => x.PersonId == person.Id).OrderByDescending(x => x.DutyStartDate).FirstOrDefaultAsync(cancellationToken);
+            var priorDuty = await _context.AstronautDuties.Where(x => x.PersonId == person.Id && x.DutyEndDate == null).FirstOrDefaultAsync(cancellationToken);
 
             if (priorDuty != null)
                 priorDuty.DutyEndDate = request.DutyStartDate.AddDays(-1).Date;
