@@ -1,5 +1,6 @@
 # How to Run
 
+Prerequisite: 
 Go to the exercise1 folder.
 
 
@@ -52,6 +53,7 @@ Install report generator tool
 dotnet tool install --global dotnet-reportgenerator-globaltool
 ```
 
+Run the report
 
 ```
 cd StargateTestBed
@@ -62,3 +64,7 @@ reportgenerator -reports:"TestResults/*/coverage.cobertura.xml" -targetdir:"cove
 ```
 
 Note: make sure to delete any prior test coverage report before running last two commands if you generated them
+
+See also:
+- [CHANGES.md](tech_exercise/package/exercise1/CHANGES.md): what was changed and why
+- [RETROSPECTIVE.md](tech_exercise/package/exercise1/RETROSPECTIVE.md): what went well, what could be improved
