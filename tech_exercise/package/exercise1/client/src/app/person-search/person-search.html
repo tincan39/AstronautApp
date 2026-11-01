@@ -1,1 +1,25 @@
-<p>person-search works!</p>
+<div class="flex justify-center mt-5 search">
+  <mat-form-field appearance="outline" class="w-[50%]">
+      <mat-icon matPrefix>search</mat-icon>
+    <input matInput placeholder="Filter People">
+  </mat-form-field>
+</div>
+
+
+<div class="people-container">
+  @for (person of people(); track person.name) {
+    <div class="card">
+      <div class="card-icon">
+        <mat-icon>person</mat-icon>
+      </div>
+      <div class="p-4 text-center">
+        <h3 class="person-name" [title]="person.name">{{ person.name }}</h3>
+        @if (person.currentDutyTitle.trim()) {
+          <p class="duty-title">{{ person.currentDutyTitle }}</p>
+        } @else {
+          <p class="text-sm text-gray-400">No current duty</p>
+        }
+      </div>
+    </div>
+  }
+</div>

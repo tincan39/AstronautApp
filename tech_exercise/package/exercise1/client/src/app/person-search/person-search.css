@@ -1,0 +1,49 @@
+.people-container {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
+    gap: 16px;
+    margin: 24px 10%;
+    overflow: auto;
+}
+
+.card {
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgb(0 0 0 / 0.12);
+    cursor: pointer;
+}
+
+.card-icon {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    height: 7rem;
+    background: #f0f9ff;
+    color: #0369a1;
+}
+
+.person-name {
+    font-size: 1rem;
+    font-weight: 600;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.duty-title {
+    font-size: 0.875rem;
+    font-style: italic;
+    color: #4b5563;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+}
+
+.card mat-icon {
+    font-size: 56px;
+    width: 56px;
+    height: 56px;
+}

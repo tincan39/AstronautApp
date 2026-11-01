@@ -35,3 +35,12 @@ body {
   // margin: 0;
   // height: 100%;
 }
+
+.search {
+  @include mat.form-field-overrides((
+    outlined-outline-color: #c4c4c4,
+    outlined-container-shape: 12px,
+    container-height: 44px,
+    container-vertical-padding: 10px
+  ));
+}
