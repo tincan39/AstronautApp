@@ -28,10 +28,16 @@ namespace StargateAPI.Controllers
         }
 
         [HttpPost("")]
-        public async Task<IActionResult> CreateAstronautDuty([FromBody] CreateAstronautDuty request, CancellationToken cancellationToken)
+        public async Task<IActionResult> CreateAstronautDuty([FromBody] CreateAstronautDutyRequest request, CancellationToken cancellationToken)
         {
-            await _mediator.Send(request, cancellationToken);
-            return Ok();         
+            await _mediator.Send(new CreateAstronautDuty()
+            {
+                Name = request.Name,
+                Rank = request.Rank,
+                DutyTitle = request.DutyTitle,
+                DutyStartDate = request.DutyStartDate
+            }, cancellationToken);
+            return Ok();
         }
     }
 }
