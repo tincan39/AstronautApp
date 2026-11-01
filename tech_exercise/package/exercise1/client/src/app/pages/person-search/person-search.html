@@ -8,7 +8,7 @@
   </a>
 </div>
 
-<app-loading-overlay [loading]="loading()" class="flex-1 min-h-0 overflow-auto">
+<app-loading-overlay [loading]="loading()" class="flex-1 overflow-auto">
   @if (!loading() && peopleToShow().length === 0) {
     <app-not-found [message]="searchValue() ? 'No people match your search' : 'No people found'" />
   } @else {
