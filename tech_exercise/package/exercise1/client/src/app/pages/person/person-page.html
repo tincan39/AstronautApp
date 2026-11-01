@@ -33,10 +33,15 @@
             </div>
             <div class="button-bar">
                 <button matButton="filled" (click)="addPerson()">Create</button>
-                <button matButton="filled" (click)="updatePerson()">Update</button>
+                <button matButton="filled" (click)="updatePerson()" [disabled]="!currPerson()">Update</button>
             </div>
         </div>
     </app-loading-overlay>
 
+    @if (statusMessage(); as s) {
+        <div class="mt-4">
+            <app-status-message [message]="s.message" [status]="s.status" />
+        </div>
+    }
 
 </div>

@@ -14,7 +14,7 @@
     gap: 1rem;
 }
 
-.person-fields {
+.person-field {
     display: flex;
     flex-direction: column;
     gap: 0.25rem;

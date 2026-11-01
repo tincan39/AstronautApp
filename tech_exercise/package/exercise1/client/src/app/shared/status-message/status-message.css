@@ -1,0 +1,23 @@
+.status-message {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  width: 100%;
+  box-sizing: border-box;
+  padding: 0.75rem 1rem;
+  border: 1px solid;
+  border-radius: 12px;
+  font-size: 0.875rem;
+}
+
+.status-message.error {
+  border-color: #dc2626;
+  background: #fef2f2;
+  color: #991b1b;
+}
+
+.status-message.success {
+  border-color: #16a34a;
+  background: #f0fdf4;
+  color: #166534;
+}

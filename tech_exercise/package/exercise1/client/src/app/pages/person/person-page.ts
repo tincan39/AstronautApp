@@ -1,6 +1,7 @@
-import { Component, DestroyRef, inject, OnInit, signal } from '@angular/core';
-import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
+import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
+import { HttpErrorResponse } from '@angular/common/http';
 import { filter, finalize, first, forkJoin, map, switchMap } from 'rxjs';
 import { PersonService, Person } from '../../services/person-service';
 import { AstronautDuty, AstronautDutyService } from '../../services/astronaut-duty-service';
@@ -10,11 +11,12 @@ import {MatInputModule} from '@angular/material/input';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { DatePipe } from '@angular/common';
 import { LoadingOverlay } from '../../shared/loading-overlay/loading-overlay';
+import { StatusMessage, StatusType } from '../../shared/status-message/status-message';
 import {MatButtonModule} from '@angular/material/button';
 
 @Component({
   selector: 'app-person',
-  imports: [MatFormFieldModule, MatInputModule, ReactiveFormsModule, DatePipe, LoadingOverlay, MatButtonModule, MatIconModule, RouterLink],
+  imports: [MatFormFieldModule, MatInputModule, ReactiveFormsModule, DatePipe, LoadingOverlay, MatButtonModule, MatIconModule, RouterLink, StatusMessage],
   templateUrl: './person-page.html',
   styleUrl: './person-page.css',
 })
@@ -31,8 +33,10 @@ export class PersonPage{
   currPerson = signal<Person | null>(null);
   astDuties = signal<AstronautDuty[]>([]);
   isLoading = signal(false);
+  statusMessage = signal<{ message: string; status: StatusType } | null>(null);
 
   constructor(){
+    // Read the route once; after that, add/update keep the page state in sync themselves.
     this.route.paramMap.pipe(
       first(),
       map(params => params.get("name")),
@@ -41,10 +45,13 @@ export class PersonPage{
       takeUntilDestroyed()
     )
     .subscribe({
-      next: ([person, duties] : [Person, AstronautDuty[]]) =>{
+      next: ([person, duties]) =>{
         this.currPerson.set(person);
+        this.name.setValue(person.name);
         this.astDuties.set(duties);
-      }
+      },
+      error: (err: HttpErrorResponse) =>
+        this.statusMessage.set({ message: this.errorMessage(err, 'Could not load this person'), status: 'error' })
     })
   }
 
@@ -57,34 +64,45 @@ export class PersonPage{
   }
 
   addPerson = () =>{
+    this.statusMessage.set(null);
     this.isLoading.set(true);
-    this.personService.createPerson(this.name.value)
+    this.personService.createPerson(this.name.value.trim())
       .pipe(finalize(() => this.isLoading.set(false)), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next:(res:Person) =>{
           this.currPerson.set(res);
-          this.name.setValue(res.name);
           this.astDuties.set([]);
-          this.router.navigate(["/person", res.name]);
-        }
+          this.name.setValue(res.name);
+          this.statusMessage.set({ message: `Created ${res.name}`, status: 'success' });
+        },
+        error: (err: HttpErrorResponse) =>
+          this.statusMessage.set({ message: this.errorMessage(err, 'Could not create this person'), status: 'error' })
       });
   }
 
   updatePerson = () =>{
-    this.isLoading.set(true);
     const currName = this.currPerson()?.name;
-    const newName = this.name.value;
-
+    
     if(currName == null)
       return;
-
+    
+    const newName = this.name.value.trim();
+    this.statusMessage.set(null);
+    this.isLoading.set(true);
     this.personService.updatePerson(currName, newName)
       .pipe(finalize(() => this.isLoading.set(false)), takeUntilDestroyed(this.destroyRef))
-     .subscribe({
+      .subscribe({
         next:() =>{
-          this.router.navigate(["/person", newName]);
-        }
+          this.currPerson.update(p => p && { ...p, name: newName });
+          this.statusMessage.set({ message: `Updated name to ${newName}`, status: 'success' });
+          this.router.navigate(['/person', newName], { replaceUrl: true });
+        },
+        error: (err: HttpErrorResponse) =>
+          this.statusMessage.set({ message: this.errorMessage(err, 'Could not update this person'), status: 'error' })
       });
   }
 
+  private errorMessage(err: HttpErrorResponse, fallback: string): string {
+    return err.error?.detail ?? fallback;
+  }
 }

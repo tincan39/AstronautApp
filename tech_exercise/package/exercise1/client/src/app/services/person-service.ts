@@ -1,6 +1,6 @@
 import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable, of } from 'rxjs';
+import { map, Observable } from 'rxjs';
 
 export interface Person {
   name: string;
@@ -38,10 +38,7 @@ export class PersonService {
       .pipe(map(res => res.person));
   }
 
-  updatePerson(name: string | null, newName: string): Observable<void> {
-    if(name == null)
-      return of();
-
+  updatePerson(name: string, newName: string): Observable<void> {
     return this.http.put<void>(`api/Person/${encodeURIComponent(name)}`, { name: newName });
   }
 }
