@@ -7,13 +7,14 @@ import {MatCardModule} from '@angular/material/card';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
-import { Person, PersonService } from '../services/person-service';
-import { LoadingOverlay } from '../shared/loading-overlay/loading-overlay';
-import { NotFound } from '../shared/not-found/not-found';
+import { Person, PersonService } from '../../services/person-service';
+import { LoadingOverlay } from '../../shared/loading-overlay/loading-overlay';
+import { NotFound } from '../../shared/not-found/not-found';
+import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-person-search',
-  imports: [CommonModule, MatFormFieldModule, MatInputModule, MatIconModule, MatCardModule, ReactiveFormsModule, LoadingOverlay, NotFound],
+  imports: [CommonModule, MatFormFieldModule, MatInputModule, MatIconModule, MatCardModule, ReactiveFormsModule, LoadingOverlay, NotFound, RouterLink],
   templateUrl: './person-search.html',
   styleUrl: './person-search.css',
   changeDetection: ChangeDetectionStrategy.OnPush

@@ -11,7 +11,7 @@
   } @else {
     <div class="people-container">
       @for (person of peopleToShow(); track person.name) {
-        <div class="card">
+        <a class="card" [routerLink]="['/person', person.name]">
           <div class="card-icon">
             <mat-icon>person</mat-icon>
           </div>
@@ -23,7 +23,7 @@
               <p class="text-sm text-gray-400">No current duty</p>
             }
           </div>
-        </div>
+        </a>
       }
     </div>
   }
