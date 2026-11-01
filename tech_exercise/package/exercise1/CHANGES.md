@@ -8,6 +8,7 @@
 ## command changes
 - removed sql injection queries
 - refactored messy logic(eg moved AstronautDetail buisness logic into the class itself)
+- Creating a person now returns the full dto 
 
 ## controller changes
 - Corrected GetAstronautDutiesByName sending the wrong request to mediatr
@@ -28,3 +29,10 @@
 - used sqllite in memory database as a stub for the database calls
 - leverages nunit for the test library 
 - user coverlet and reportgenerator to generate and view code coverage reports
+    - code migrations are excluded from the report
+
+## FrontEnd
+- There are three pages
+    - The Search Page, where you can search for people
+    - The Person Page, where you can create, update person; add new astronaut duties; and view past duties
+    - A "Page Not Found" Page for all invalid routes
