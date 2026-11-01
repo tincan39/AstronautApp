@@ -1,4 +1,4 @@
-import { Component, computed, DestroyRef, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -24,6 +24,7 @@ import { NotFound } from '../../shared/not-found/not-found';
   providers: [provideNativeDateAdapter()],
   templateUrl: './person-page.html',
   styleUrl: './person-page.css',
+  changeDetection: ChangeDetectionStrategy.OnPush
 })
 export class PersonPage{
   private personService = inject(PersonService);
