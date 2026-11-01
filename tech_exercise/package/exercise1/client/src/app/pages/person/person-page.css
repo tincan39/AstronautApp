@@ -3,8 +3,13 @@
 }
 
 .person-page{
-    margin: 0 30%;
-    margin-top: 1.25rem;
+    margin: 1.25rem 10%;
+}
+
+@media (min-width: 1400px) {
+  .person-page {
+    margin: 1.25rem 30%;
+  }
 }
 
 .person-fields {
@@ -33,4 +38,25 @@
     display: flex;
     justify-content: space-between;
     margin-top: 1rem;
+}
+
+.duty-list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    margin-top: 1rem;
+}
+
+.duty-title {
+    font-weight: 600;
+}
+
+.duty-rank {
+    font-size: 0.875rem;
+    color: #4b5563;
+}
+
+.duty-dates {
+    font-size: 0.8125rem;
+    color: #6b7280;
 }

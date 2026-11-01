@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal, viewChild } from '@angular/core';
+import { Component, computed, DestroyRef, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -15,10 +15,12 @@ import { StatusMessage, StatusType } from '../../shared/status-message/status-me
 import {MatButtonModule} from '@angular/material/button';
 import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
+import { MatDividerModule } from '@angular/material/divider';
+import { NotFound } from '../../shared/not-found/not-found';
 
 @Component({
   selector: 'app-person',
-  imports: [MatFormFieldModule, MatInputModule, ReactiveFormsModule, DatePipe, LoadingOverlay, MatButtonModule, MatIconModule, RouterLink, StatusMessage, MatDatepickerModule],
+  imports: [MatFormFieldModule, MatInputModule, ReactiveFormsModule, DatePipe, LoadingOverlay, MatButtonModule, MatIconModule, RouterLink, StatusMessage, MatDatepickerModule, MatDividerModule, NotFound],
   providers: [provideNativeDateAdapter()],
   templateUrl: './person-page.html',
   styleUrl: './person-page.css',
@@ -42,6 +44,12 @@ export class PersonPage{
 
   currPerson = signal<Person | null>(null);
   astDuties = signal<AstronautDuty[]>([]);
+  // Ended duties, newest first. The open duty is already shown on the person card.
+  pastDuties = computed(() =>
+    this.astDuties()
+      .filter(d => d.dutyEndDate !== null)
+      .sort((a, b) => b.dutyStartDate.localeCompare(a.dutyStartDate))
+  );
   isLoading = signal(false);
   // The duty <form [formGroup]>; resetting through it also clears its `submitted` state.
   private dutyFormDir = viewChild(FormGroupDirective);

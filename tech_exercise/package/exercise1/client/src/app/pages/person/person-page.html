@@ -74,6 +74,25 @@
                     <app-status-message [message]="s.message" [status]="s.status" />
                 </div>
             }
+
+            <section class="mt-6">
+                <h5 class="mb-2">Past duties</h5>
+                <mat-divider />
+
+                @if (pastDuties().length === 0) {
+                    <app-not-found message="No past duties" />
+                } @else {
+                    <div class="duty-list">
+                        @for (duty of pastDuties(); track duty.dutyStartDate) {
+                            <div class="card p-4">
+                                <div class="duty-title">{{ duty.dutyTitle }}</div>
+                                <div class="duty-rank">{{ duty.rank }}</div>
+                                <div class="duty-dates">{{ duty.dutyStartDate | date }} – {{ duty.dutyEndDate | date }}</div>
+                            </div>
+                        }
+                    </div>
+                }
+            </section>
         }
     </app-loading-overlay>
 </div>
