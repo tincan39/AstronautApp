@@ -1,4 +1,4 @@
-import { Component, DestroyRef, inject, signal } from '@angular/core';
+import { Component, DestroyRef, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
@@ -8,15 +8,18 @@ import { AstronautDuty, AstronautDutyService } from '../../services/astronaut-du
 import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
-import { FormControl, ReactiveFormsModule } from '@angular/forms';
-import { DatePipe } from '@angular/common';
+import { FormControl, FormGroupDirective, NonNullableFormBuilder, ReactiveFormsModule, Validators } from '@angular/forms';
+import { DatePipe, formatDate } from '@angular/common';
 import { LoadingOverlay } from '../../shared/loading-overlay/loading-overlay';
 import { StatusMessage, StatusType } from '../../shared/status-message/status-message';
 import {MatButtonModule} from '@angular/material/button';
+import { MatDatepickerModule } from '@angular/material/datepicker';
+import { provideNativeDateAdapter } from '@angular/material/core';
 
 @Component({
   selector: 'app-person',
-  imports: [MatFormFieldModule, MatInputModule, ReactiveFormsModule, DatePipe, LoadingOverlay, MatButtonModule, MatIconModule, RouterLink, StatusMessage],
+  imports: [MatFormFieldModule, MatInputModule, ReactiveFormsModule, DatePipe, LoadingOverlay, MatButtonModule, MatIconModule, RouterLink, StatusMessage, MatDatepickerModule],
+  providers: [provideNativeDateAdapter()],
   templateUrl: './person-page.html',
   styleUrl: './person-page.css',
 })
@@ -27,13 +30,23 @@ export class PersonPage{
   private destroyRef = inject(DestroyRef);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
+  private fb = inject(NonNullableFormBuilder);
 
   name =  new FormControl('', { nonNullable: true });
+
+  dutyForm = this.fb.group({
+    rank: ['', Validators.required],
+    dutyTitle: ['', Validators.required],
+    dutyStartDate: this.fb.control<Date | null>(null, Validators.required),
+  });
 
   currPerson = signal<Person | null>(null);
   astDuties = signal<AstronautDuty[]>([]);
   isLoading = signal(false);
+  // The duty <form [formGroup]>; resetting through it also clears its `submitted` state.
+  private dutyFormDir = viewChild(FormGroupDirective);
   statusMessage = signal<{ message: string; status: StatusType } | null>(null);
+  dutyStatusMessage = signal<{ message: string; status: StatusType } | null>(null);
 
   constructor(){
     // Read the route once; after that, add/update keep the page state in sync themselves.
@@ -99,6 +112,41 @@ export class PersonPage{
         },
         error: (err: HttpErrorResponse) =>
           this.statusMessage.set({ message: this.errorMessage(err, 'Could not update this person'), status: 'error' })
+      });
+  }
+
+  addDuty = () =>{
+    const person = this.currPerson();
+    const { rank, dutyTitle, dutyStartDate } = this.dutyForm.getRawValue();
+
+    if(person == null || this.dutyForm.invalid || dutyStartDate == null)
+      return;
+
+    this.dutyStatusMessage.set(null);
+    this.isLoading.set(true);
+    this.dutiesService.createDuty({
+        name: person.name,
+        rank: rank.trim(),
+        dutyTitle: dutyTitle.trim(),
+        // Send a plain date so the browser's timezone can't shift it to another day.
+        dutyStartDate: formatDate(dutyStartDate, 'yyyy-MM-dd', 'en-US'),
+      })
+      .pipe(
+        // A new duty changes the person's rank/title/career dates and closes the prior duty, so refetch both.
+        switchMap(() => this.loadPersonAndDuties(person.name)),
+        finalize(() => this.isLoading.set(false)),
+        takeUntilDestroyed(this.destroyRef)
+      )
+      .subscribe({
+        next: ([p, duties]) =>{
+          this.currPerson.set(p);
+          this.astDuties.set(duties);
+          // dutyForm.reset() would leave the directive "submitted", so Material would flag the empty required fields red.
+          this.dutyFormDir()?.resetForm();
+          this.dutyStatusMessage.set({ message: `Added duty ${dutyTitle.trim()}`, status: 'success' });
+        },
+        error: (err: HttpErrorResponse) =>
+          this.dutyStatusMessage.set({ message: this.errorMessage(err, 'Could not add this duty'), status: 'error' })
       });
   }
 

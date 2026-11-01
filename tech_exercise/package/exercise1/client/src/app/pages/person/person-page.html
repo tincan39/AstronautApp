@@ -36,12 +36,44 @@
                 <button matButton="filled" (click)="updatePerson()" [disabled]="!currPerson()">Update</button>
             </div>
         </div>
+
+        @if (statusMessage(); as s) {
+            <div class="mt-4">
+                <app-status-message [message]="s.message" [status]="s.status" />
+            </div>
+        }
+
+        @if (currPerson()) {
+            <form class="card p-4 mt-6" [formGroup]="dutyForm" (ngSubmit)="addDuty()">
+                <h5 class="mt-0">Add Astronaut Duty</h5>
+                <div class="person-fields">
+                    <mat-form-field appearance="outline">
+                        <mat-label>Rank</mat-label>
+                        <input matInput formControlName="rank">
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Duty Title</mat-label>
+                        <input matInput formControlName="dutyTitle">
+                    </mat-form-field>
+
+                    <mat-form-field appearance="outline">
+                        <mat-label>Start Date</mat-label>
+                        <input matInput [matDatepicker]="startPicker" formControlName="dutyStartDate">
+                        <mat-datepicker-toggle matIconSuffix [for]="startPicker" />
+                        <mat-datepicker #startPicker />
+                    </mat-form-field>
+                </div>
+                <div class="button-bar justify-end">
+                    <button matButton="filled" type="submit" [disabled]="dutyForm.invalid">Add Duty</button>
+                </div>
+            </form>
+
+            @if (dutyStatusMessage(); as s) {
+                <div class="mt-4">
+                    <app-status-message [message]="s.message" [status]="s.status" />
+                </div>
+            }
+        }
     </app-loading-overlay>
-
-    @if (statusMessage(); as s) {
-        <div class="mt-4">
-            <app-status-message [message]="s.message" [status]="s.status" />
-        </div>
-    }
-
 </div>
