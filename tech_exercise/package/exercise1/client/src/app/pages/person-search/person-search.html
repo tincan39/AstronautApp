@@ -1,8 +1,11 @@
 <div class="search-field search">
-  <mat-form-field appearance="outline" class="w-[50%]">
+  <mat-form-field appearance="outline" class="w-[50%]" subscriptSizing="dynamic">
     <mat-icon matPrefix>search</mat-icon>
     <input matInput placeholder="Filter People" [formControl]="searchField">
   </mat-form-field>
+  <a mat-flat-button routerLink="/person">
+    <mat-icon>person_add</mat-icon> Add New Person
+  </a>
 </div>
 
 <app-loading-overlay [loading]="loading()" class="flex-1">

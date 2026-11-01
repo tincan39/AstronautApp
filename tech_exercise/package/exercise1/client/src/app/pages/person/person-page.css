@@ -1,0 +1,27 @@
+
+.person-page{
+    margin: 0 30%;
+    margin-top: 1.25rem;
+}
+
+.person-fields {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
+.person-fields {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.field-label {
+    color: #6b7280;
+}
+
+.field-value {
+    font-weight: 600;
+}

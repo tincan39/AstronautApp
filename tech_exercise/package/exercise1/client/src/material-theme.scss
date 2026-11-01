@@ -36,7 +36,7 @@ body {
   // height: 100%;
 }
 
-.search {
+:root {
   @include mat.form-field-overrides((
     outlined-outline-color: #c4c4c4,
     outlined-container-shape: 12px,

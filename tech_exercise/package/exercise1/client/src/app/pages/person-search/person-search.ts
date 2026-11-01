@@ -4,6 +4,7 @@ import {MatFormFieldModule} from '@angular/material/form-field';
 import {MatIconModule} from '@angular/material/icon';
 import {MatInputModule} from '@angular/material/input';
 import {MatCardModule} from '@angular/material/card';
+import { MatButtonModule } from '@angular/material/button';
 import { FormControl, ReactiveFormsModule } from '@angular/forms';
 import { debounceTime, distinctUntilChanged, finalize } from 'rxjs';
 import { takeUntilDestroyed, toSignal } from '@angular/core/rxjs-interop';
@@ -14,7 +15,7 @@ import { RouterLink } from '@angular/router';
 
 @Component({
   selector: 'app-person-search',
-  imports: [CommonModule, MatFormFieldModule, MatInputModule, MatIconModule, MatCardModule, ReactiveFormsModule, LoadingOverlay, NotFound, RouterLink],
+  imports: [CommonModule, MatFormFieldModule, MatInputModule, MatIconModule, MatCardModule, MatButtonModule, ReactiveFormsModule, LoadingOverlay, NotFound, RouterLink],
   templateUrl: './person-search.html',
   styleUrl: './person-search.css',
   changeDetection: ChangeDetectionStrategy.OnPush

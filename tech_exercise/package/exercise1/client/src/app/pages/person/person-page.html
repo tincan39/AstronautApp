@@ -1,1 +1,34 @@
-<p>person works!</p>
+<div class="person-page">
+    <app-loading-overlay [loading]="false">
+        <div class="card p-4">
+            <div class="person-fields">
+                <mat-form-field appearance="outline">
+                    <mat-label>Name</mat-label>
+                    <input id="person-name" matInput>
+                </mat-form-field>
+    
+                <div class="person-field">
+                    <div class="field-label">Current Rank</div>
+                    <div class="field-value">{{ currPerson()?.currentRank || '—' }}</div>
+                </div>
+    
+                <div class="person-field">
+                    <div class="field-label">Current Duty</div>
+                    <div class="field-value">{{ currPerson()?.currentDutyTitle || '—' }}</div>
+                </div>
+    
+                <div class="person-field">
+                    <div class="field-label">Career Start</div>
+                    <div class="field-value">{{ currPerson()?.careerStartDate ? (currPerson()?.careerStartDate | date) : '—' }}</div>
+                </div>
+    
+                <div class="person-field">
+                    <div class="field-label">Career End</div>
+                    <div class="field-value">{{ currPerson()?.careerEndDate ? (currPerson()?.careerEndDate | date) : '—' }}</div>
+                </div>
+            </div>
+        </div>
+    </app-loading-overlay>
+
+
+</div>
