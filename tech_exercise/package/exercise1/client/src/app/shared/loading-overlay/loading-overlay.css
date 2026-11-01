@@ -1,0 +1,18 @@
+:host {
+  position: relative;
+  display: block;
+}
+
+:host(.is-loading) {
+  min-height: 12rem;
+}
+
+.overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: rgb(249 250 251 / 0.7);
+}

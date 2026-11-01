@@ -1,0 +1,16 @@
+.not-found {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 3rem 1rem;
+  color: #6b7280;
+  text-align: center;
+}
+
+mat-icon {
+  font-size: 4rem;
+  width: 4rem;
+  height: 4rem;
+  color: #f59e0b;
+}

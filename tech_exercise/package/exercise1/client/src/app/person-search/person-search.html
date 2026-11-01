@@ -1,25 +1,30 @@
-<div class="flex justify-center mt-5 search">
+<div class="search-field search">
   <mat-form-field appearance="outline" class="w-[50%]">
-      <mat-icon matPrefix>search</mat-icon>
-    <input matInput placeholder="Filter People">
+    <mat-icon matPrefix>search</mat-icon>
+    <input matInput placeholder="Filter People" [formControl]="searchField">
   </mat-form-field>
 </div>
 
-
-<div class="people-container">
-  @for (person of people(); track person.name) {
-    <div class="card">
-      <div class="card-icon">
-        <mat-icon>person</mat-icon>
-      </div>
-      <div class="p-4 text-center">
-        <h3 class="person-name" [title]="person.name">{{ person.name }}</h3>
-        @if (person.currentDutyTitle.trim()) {
-          <p class="duty-title">{{ person.currentDutyTitle }}</p>
-        } @else {
-          <p class="text-sm text-gray-400">No current duty</p>
-        }
-      </div>
+<app-loading-overlay [loading]="loading()" class="flex-1">
+  @if (!loading() && peopleToShow().length === 0) {
+    <app-not-found [message]="searchValue() ? 'No people match your search' : 'No people found'" />
+  } @else {
+    <div class="people-container">
+      @for (person of peopleToShow(); track person.name) {
+        <div class="card">
+          <div class="card-icon">
+            <mat-icon>person</mat-icon>
+          </div>
+          <div class="p-4 text-center">
+            <h3 class="person-name" [title]="person.name">{{ person.name }}</h3>
+            @if (person.currentDutyTitle.trim()) {
+              <p class="duty-title">{{ person.currentDutyTitle }}</p>
+            } @else {
+              <p class="text-sm text-gray-400">No current duty</p>
+            }
+          </div>
+        </div>
+      }
     </div>
   }
-</div>
+</app-loading-overlay>
