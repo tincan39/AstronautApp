@@ -26,7 +26,7 @@ export class PersonSearch implements OnInit {
   people = signal<Person[]>([]);
   loading = signal(true);
 
-  searchField = new FormControl({value: '', disabled: true}, { nonNullable: true })
+  searchField = new FormControl({value: '', disabled: true}, { nonNullable: true });
 
   constructor() {
     effect(() => {

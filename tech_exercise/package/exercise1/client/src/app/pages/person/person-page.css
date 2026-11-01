@@ -1,3 +1,6 @@
+.back-button {
+    margin: 1rem 0 0 1rem;
+}
 
 .person-page{
     margin: 0 30%;
@@ -24,4 +27,10 @@
 
 .field-value {
     font-weight: 600;
+}
+
+.button-bar{
+    display: flex;
+    justify-content: space-between;
+    margin-top: 1rem;
 }

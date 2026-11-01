@@ -1,10 +1,14 @@
+<a matButton="text" routerLink="/search" class="back-button">
+    <mat-icon>arrow_back</mat-icon> Back to Search
+</a>
+
 <div class="person-page">
-    <app-loading-overlay [loading]="false">
+    <app-loading-overlay [loading]="isLoading()">
         <div class="card p-4">
             <div class="person-fields">
-                <mat-form-field appearance="outline">
+                <mat-form-field appearance="outline" floatLabel="always">
                     <mat-label>Name</mat-label>
-                    <input id="person-name" matInput>
+                    <input id="person-name" matInput [formControl]="name">
                 </mat-form-field>
     
                 <div class="person-field">
@@ -26,6 +30,10 @@
                     <div class="field-label">Career End</div>
                     <div class="field-value">{{ currPerson()?.careerEndDate ? (currPerson()?.careerEndDate | date) : '—' }}</div>
                 </div>
+            </div>
+            <div class="button-bar">
+                <button matButton="filled" (click)="addPerson()">Create</button>
+                <button matButton="filled" (click)="updatePerson()">Update</button>
             </div>
         </div>
     </app-loading-overlay>

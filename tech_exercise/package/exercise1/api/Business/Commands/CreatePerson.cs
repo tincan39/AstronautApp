@@ -2,13 +2,14 @@
 using MediatR.Pipeline;
 using Microsoft.EntityFrameworkCore;
 using StargateAPI.Business.Data;
+using StargateAPI.Business.Dtos;
 using StargateAPI.Business.Exceptions;
 using StargateAPI.Controllers;
 using System.Net;
 
 namespace StargateAPI.Business.Commands
 {
-    public class CreatePerson : IRequest
+    public class CreatePerson : IRequest<CreatePersonResult>
     {
         public required string Name { get; set; } = string.Empty;
     }
@@ -30,7 +31,7 @@ namespace StargateAPI.Business.Commands
         }
     }
 
-    public class CreatePersonHandler : IRequestHandler<CreatePerson>
+    public class CreatePersonHandler : IRequestHandler<CreatePerson, CreatePersonResult>
     {
         private readonly StargateContext _context;
 
@@ -38,7 +39,7 @@ namespace StargateAPI.Business.Commands
         {
             _context = context;
         }
-        public async Task Handle(CreatePerson request, CancellationToken cancellationToken)
+        public async Task<CreatePersonResult> Handle(CreatePerson request, CancellationToken cancellationToken)
         {
             var newPerson = new Person()
             {
@@ -47,6 +48,10 @@ namespace StargateAPI.Business.Commands
 
             await _context.People.AddAsync(newPerson, cancellationToken);
             await _context.SaveChangesAsync(cancellationToken);
+
+            return new CreatePersonResult(PersonDTO.FromPerson(newPerson));
         }
     }
+
+    public record CreatePersonResult(PersonDTO Person);
 }

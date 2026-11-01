@@ -1,6 +1,6 @@
-import { HttpClient, HttpHeaders } from '@angular/common/http';
+import { HttpClient } from '@angular/common/http';
 import { inject, Injectable } from '@angular/core';
-import { map, Observable } from 'rxjs';
+import { map, Observable, of } from 'rxjs';
 
 export interface Person {
   name: string;
@@ -32,15 +32,16 @@ export class PersonService {
       .pipe(map(res => res.person));
   }
 
-  createPerson(name: string): Observable<void> {
-    // The API binds the body as a raw JSON string ([FromBody] string name),
-    // so it must be sent as JSON rather than HttpClient's default text/plain.
-    return this.http.post<void>('api/Person', JSON.stringify(name), {
-      headers: new HttpHeaders({ 'Content-Type': 'application/json' }),
-    });
+  createPerson(name: string): Observable<Person> {
+    return this.http
+      .post<GetPersonResponse>('api/Person', { name })
+      .pipe(map(res => res.person));
   }
 
-  updatePerson(name: string, newName: string): Observable<void> {
+  updatePerson(name: string | null, newName: string): Observable<void> {
+    if(name == null)
+      return of();
+
     return this.http.put<void>(`api/Person/${encodeURIComponent(name)}`, { name: newName });
   }
 }

@@ -37,13 +37,13 @@ namespace StargateAPI.Controllers
         }
 
         [HttpPost("")]
-        public async Task<IActionResult> CreatePerson([FromBody] string name, CancellationToken cancellationToken)
+        public async Task<IActionResult> CreatePerson([FromBody] CreatePersonRequest request, CancellationToken cancellationToken)
         {
-            await _mediator.Send(new CreatePerson()
+            var result = await _mediator.Send(new CreatePerson()
             {
-                Name = name
+                Name = request.Name
             }, cancellationToken);
-            return Ok();
+            return CreatedAtAction(nameof(GetPersonByName), new { name = result.Person.Name }, result);
         }
 
         [HttpPut("{name}")]

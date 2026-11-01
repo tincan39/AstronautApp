@@ -7,10 +7,10 @@ namespace StargateTestBed.Business.Commands
 {
     public class CreatePersonTests : BaseTester
     {
-        private async Task SendAsync(CreatePerson request)
+        private async Task<CreatePersonResult> SendAsync(CreatePerson request)
         {
             await new CreatePersonPreProcessor(Context).Process(request, CancellationToken.None);
-            await new CreatePersonHandler(Context).Handle(request, CancellationToken.None);
+            return await new CreatePersonHandler(Context).Handle(request, CancellationToken.None);
         }
 
         [Test]
@@ -18,7 +18,7 @@ namespace StargateTestBed.Business.Commands
         {
             var name = "Neil Armstrong";
 
-            await SendAsync(new CreatePerson { Name = name });
+            var result = await SendAsync(new CreatePerson { Name = name });
 
             using var db = CreateContext();
             var person = await db.People.Include(x => x.AstronautDetail).SingleAsync();
@@ -26,6 +26,8 @@ namespace StargateTestBed.Business.Commands
             {
                 Assert.That(person.Name, Is.EqualTo(name));
                 Assert.That(person.AstronautDetail, Is.Null);
+                Assert.That(result.Person.Name, Is.EqualTo(name));
+                Assert.That(result.Person.CurrentRank, Is.Empty);
             }
         }
 
