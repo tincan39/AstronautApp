@@ -17,7 +17,6 @@
     grid-template-columns: repeat(auto-fill, minmax(12rem, 1fr));
     gap: 16px;
     margin: 24px 10%;
-    overflow: auto;
 }
 
 .card {
