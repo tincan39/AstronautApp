@@ -4,8 +4,6 @@ using Microsoft.EntityFrameworkCore;
 using StargateAPI.Business.Data;
 using StargateAPI.Business.Dtos;
 using StargateAPI.Business.Exceptions;
-using StargateAPI.Controllers;
-using System.Net;
 
 namespace StargateAPI.Business.Commands
 {

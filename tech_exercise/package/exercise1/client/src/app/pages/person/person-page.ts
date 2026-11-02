@@ -37,6 +37,7 @@ export class PersonPage{
 
   name =  new FormControl('', { nonNullable: true });
 
+  private dutyFormDir = viewChild(FormGroupDirective);
   dutyForm = this.fb.group({
     rank: ['', Validators.required],
     dutyTitle: ['', Validators.required],
@@ -45,20 +46,18 @@ export class PersonPage{
 
   currPerson = signal<Person | null>(null);
   astDuties = signal<AstronautDuty[]>([]);
-  // Ended duties, newest first. The open duty is already shown on the person card.
+  
   pastDuties = computed(() =>
     this.astDuties()
       .filter(d => d.dutyEndDate !== null)
       .sort((a, b) => b.dutyStartDate.localeCompare(a.dutyStartDate))
   );
+
   isLoading = signal(false);
-  // The duty <form [formGroup]>; resetting through it also clears its `submitted` state.
-  private dutyFormDir = viewChild(FormGroupDirective);
   statusMessage = signal<{ message: string; status: StatusType } | null>(null);
   dutyStatusMessage = signal<{ message: string; status: StatusType } | null>(null);
 
   constructor(){
-    // Read the route once; after that, add/update keep the page state in sync themselves.
     this.route.paramMap.pipe(
       first(),
       map(params => params.get("name")),
@@ -137,20 +136,18 @@ export class PersonPage{
         name: person.name,
         rank: rank.trim(),
         dutyTitle: dutyTitle.trim(),
-        // Send a plain date so the browser's timezone can't shift it to another day.
         dutyStartDate: formatDate(dutyStartDate, 'yyyy-MM-dd', 'en-US'),
       })
       .pipe(
-        // A new duty changes the person's rank/title/career dates and closes the prior duty, so refetch both.
         switchMap(() => this.loadPersonAndDuties(person.name)),
         finalize(() => this.isLoading.set(false)),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({
-        next: ([p, duties]) =>{
-          this.currPerson.set(p);
+        next: ([person, duties]) =>{
+          this.currPerson.set(person);
           this.astDuties.set(duties);
-          // dutyForm.reset() would leave the directive "submitted", so Material would flag the empty required fields red.
+
           this.dutyFormDir()?.resetForm();
           this.dutyStatusMessage.set({ message: `Added duty ${dutyTitle.trim()}`, status: 'success' });
         },

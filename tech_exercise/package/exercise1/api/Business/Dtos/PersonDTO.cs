@@ -9,7 +9,6 @@ namespace StargateAPI.Business.Dtos
         DateTime? CareerStartDate,
         DateTime? CareerEndDate)
     {
-        // Requires person.AstronautDetail to be loaded (e.g. via Include).
         public static PersonDTO FromPerson(Person person) => new(
             person.Name,
             person.AstronautDetail?.CurrentRank ?? string.Empty,

@@ -1,9 +1,7 @@
 ﻿using MediatR;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 using StargateAPI.Business.Commands;
 using StargateAPI.Business.Queries;
-using System.Net;
 
 namespace StargateAPI.Controllers
 {
