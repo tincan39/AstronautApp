@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, computed, DestroyRef, inject, signa
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HttpErrorResponse } from '@angular/common/http';
-import { filter, finalize, first, forkJoin, map, switchMap } from 'rxjs';
+import { filter, first, forkJoin, map, switchMap } from 'rxjs';
 import { PersonService, Person } from '../../services/person-service';
 import { AstronautDuty, AstronautDutyService } from '../../services/astronaut-duty-service';
 import {MatFormFieldModule} from '@angular/material/form-field';
@@ -17,11 +17,13 @@ import { MatDatepickerModule } from '@angular/material/datepicker';
 import { provideNativeDateAdapter } from '@angular/material/core';
 import { MatDividerModule } from '@angular/material/divider';
 import { NotFound } from '../../shared/not-found/not-found';
+import { LoadingService } from '../../services/loading-service';
+import { trackLoading } from '../../services/track-loading';
 
 @Component({
   selector: 'app-person',
   imports: [MatFormFieldModule, MatInputModule, ReactiveFormsModule, DatePipe, LoadingOverlay, MatButtonModule, MatIconModule, RouterLink, StatusMessage, MatDatepickerModule, MatDividerModule, NotFound],
-  providers: [provideNativeDateAdapter()],
+  providers: [provideNativeDateAdapter(), LoadingService],
   templateUrl: './person-page.html',
   styleUrl: './person-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush
@@ -29,13 +31,12 @@ import { NotFound } from '../../shared/not-found/not-found';
 export class PersonPage{
   private personService = inject(PersonService);
   private dutiesService = inject(AstronautDutyService);
-  
+  private loadingService = inject(LoadingService);
+
   private destroyRef = inject(DestroyRef);
   private route = inject(ActivatedRoute);
   private router = inject(Router);
   private fb = inject(NonNullableFormBuilder);
-
-  name =  new FormControl('', { nonNullable: true });
 
   private dutyFormDir = viewChild(FormGroupDirective);
   dutyForm = this.fb.group({
@@ -43,6 +44,8 @@ export class PersonPage{
     dutyTitle: ['', Validators.required],
     dutyStartDate: this.fb.control<Date | null>(null, Validators.required),
   });
+  
+  name =  new FormControl('', { nonNullable: true });
 
   currPerson = signal<Person | null>(null);
   astDuties = signal<AstronautDuty[]>([]);
@@ -53,7 +56,7 @@ export class PersonPage{
       .sort((a, b) => b.dutyStartDate.localeCompare(a.dutyStartDate))
   );
 
-  isLoading = signal(false);
+  isLoading = this.loadingService.isLoading;
   statusMessage = signal<{ message: string; status: StatusType } | null>(null);
   dutyStatusMessage = signal<{ message: string; status: StatusType } | null>(null);
 
@@ -78,17 +81,15 @@ export class PersonPage{
 
 
   loadPersonAndDuties = (name : string) =>{
-    this.isLoading.set(true);
     return forkJoin([this.personService.getPerson(name), this.dutiesService.getDuties(name)]).pipe(
-      finalize(() => this.isLoading.set(false))
+      trackLoading(this.loadingService)
     );
   }
 
   addPerson = () =>{
     this.statusMessage.set(null);
-    this.isLoading.set(true);
     this.personService.createPerson(this.name.value.trim())
-      .pipe(finalize(() => this.isLoading.set(false)), takeUntilDestroyed(this.destroyRef))
+      .pipe(trackLoading(this.loadingService), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next:(res:Person) =>{
           this.currPerson.set(res);
@@ -109,9 +110,8 @@ export class PersonPage{
     
     const newName = this.name.value.trim();
     this.statusMessage.set(null);
-    this.isLoading.set(true);
     this.personService.updatePerson(currName, newName)
-      .pipe(finalize(() => this.isLoading.set(false)), takeUntilDestroyed(this.destroyRef))
+      .pipe(trackLoading(this.loadingService), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next:() =>{
           this.currPerson.update(p => p && { ...p, name: newName });
@@ -131,7 +131,6 @@ export class PersonPage{
       return;
 
     this.dutyStatusMessage.set(null);
-    this.isLoading.set(true);
     this.dutiesService.createDuty({
         name: person.name,
         rank: rank.trim(),
@@ -139,8 +138,8 @@ export class PersonPage{
         dutyStartDate: formatDate(dutyStartDate, 'yyyy-MM-dd', 'en-US'),
       })
       .pipe(
+        trackLoading(this.loadingService),
         switchMap(() => this.loadPersonAndDuties(person.name)),
-        finalize(() => this.isLoading.set(false)),
         takeUntilDestroyed(this.destroyRef)
       )
       .subscribe({

@@ -11,7 +11,6 @@ required endpoints
 - Logging to the database could be improved. I set up logging with the StargateContext instead of using a library like Serilog to funnel logs into the DB. I had to abandon the Serilog approach because I discovered SQLite only accepts one writer at a time and that causes issues
 - Accounting for concurrency issues involving multiple requests
 - Some of the operations were slower than I expected. Latency could definitely be improved
-- the IsLoading logic could be cleaned up
 - the person page component has duplicate code that could be cleaned up
 
 ## What I would do with more time
