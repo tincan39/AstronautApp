@@ -16,7 +16,7 @@ namespace StargateTestBed.PipelineBehaviors
             var behavior = new LoggingBehavior<CreatePerson, CreatePersonResult>(
                 NullLogger<LoggingBehavior<CreatePerson, CreatePersonResult>>.Instance, Context);
             var ex = await Assert.ThrowsAsync<ClientException>(async () =>
-                await behavior.Handle(new CreatePerson { Name = "John Doe" }, () => throw new ClientException(message), CancellationToken.None));
+                await behavior.Handle(new CreatePerson("John Doe"), () => throw new ClientException(message), CancellationToken.None));
 
             using var db = CreateContext();
             var log = await db.Logs.SingleAsync();

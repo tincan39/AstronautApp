@@ -5,10 +5,7 @@ using StargateAPI.Business.Dtos;
 
 namespace StargateAPI.Business.Queries
 {
-    public record GetAstronautDutiesByName : IRequest<GetAstronautDutiesByNameResult>
-    {
-        public string Name { get; init; } = string.Empty;
-    }
+    public record GetAstronautDutiesByName(string Name) : IRequest<GetAstronautDutiesByNameResult>;
 
     public class GetAstronautDutiesByNameHandler : IRequestHandler<GetAstronautDutiesByName, GetAstronautDutiesByNameResult>
     {

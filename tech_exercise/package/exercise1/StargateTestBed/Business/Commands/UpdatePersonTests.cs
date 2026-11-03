@@ -28,7 +28,7 @@ namespace StargateTestBed.Business.Commands
             var person = await SeedPersonAsync(oldName);
             await SeedDutyAsync(person, "1LT", dutyTitle, new DateTime(2020, 1, 15));
 
-            await SendAsync(new UpdatePerson { Name = oldName, NewName = newName });
+            await SendAsync(new UpdatePerson(oldName, newName));
 
             using var db = CreateContext();
             var renamed = await db.People.Include(x => x.AstronautDuties).SingleAsync();
@@ -46,7 +46,7 @@ namespace StargateTestBed.Business.Commands
             var renamedName = "John Doe";
             await SeedPersonAsync(storedName);
 
-            await SendAsync(new UpdatePerson { Name = storedName, NewName = renamedName });
+            await SendAsync(new UpdatePerson(storedName, renamedName));
 
             Assert.That(await GetNamesAsync(), Is.EqualTo(new[] { renamedName }));
         }
@@ -58,7 +58,7 @@ namespace StargateTestBed.Business.Commands
             await SeedPersonAsync(name);
 
             var ex = await Assert.ThrowsAsync<ClientException>(async () =>
-                await SendAsync(new UpdatePerson { Name = name, NewName = " " }));
+                await SendAsync(new UpdatePerson(name, " ")));
 
             var names = await GetNamesAsync();
             using (Assert.EnterMultipleScope())
@@ -73,7 +73,7 @@ namespace StargateTestBed.Business.Commands
         public async Task Send_UnknownPerson_ThrowsNotFound()
         {
             var ex = await Assert.ThrowsAsync<ClientException>(async () =>
-                await SendAsync(new UpdatePerson { Name = "Nobody", NewName = "Somebody" }));
+                await SendAsync(new UpdatePerson("Nobody", "Somebody")));
 
             using (Assert.EnterMultipleScope())
             {
@@ -91,7 +91,7 @@ namespace StargateTestBed.Business.Commands
             await SeedPersonAsync(otherName);
 
             var ex = await Assert.ThrowsAsync<ClientException>(async () =>
-                await SendAsync(new UpdatePerson { Name = existingName, NewName = otherName.ToLowerInvariant() }));
+                await SendAsync(new UpdatePerson(existingName, otherName.ToLowerInvariant())));
 
             var names = await GetNamesAsync();
             using (Assert.EnterMultipleScope())

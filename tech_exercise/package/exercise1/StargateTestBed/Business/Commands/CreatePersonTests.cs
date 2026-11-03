@@ -18,7 +18,7 @@ namespace StargateTestBed.Business.Commands
         {
             var name = "Neil Armstrong";
 
-            var result = await SendAsync(new CreatePerson { Name = name });
+            var result = await SendAsync(new CreatePerson(name));
 
             using var db = CreateContext();
             var person = await db.People.Include(x => x.AstronautDetail).SingleAsync();
@@ -38,7 +38,7 @@ namespace StargateTestBed.Business.Commands
             var preProcessor = new CreatePersonPreProcessor(Context);
 
             var ex = await Assert.ThrowsAsync<ClientException>(async () =>
-                await preProcessor.Process(new CreatePerson { Name = "john doe" }, CancellationToken.None));
+                await preProcessor.Process(new CreatePerson("john doe"), CancellationToken.None));
 
             using (Assert.EnterMultipleScope())
             {
@@ -50,7 +50,7 @@ namespace StargateTestBed.Business.Commands
         [Test]
         public async Task Send_BlankName_ThrowsClientExceptionAndCreatesNothing()
         {
-            var ex = await Assert.ThrowsAsync<ClientException>(async () => await SendAsync(new CreatePerson { Name = " " }));
+            var ex = await Assert.ThrowsAsync<ClientException>(async () => await SendAsync(new CreatePerson(" ")));
 
             using var db = CreateContext();
             var peopleCount = await db.People.CountAsync();

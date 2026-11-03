@@ -18,7 +18,7 @@ namespace StargateTestBed.Business.Commands
         }
 
         private static CreateAstronautDuty Duty(string name, string rank, string title, DateTime start) =>
-            new() { Name = name, Rank = rank, DutyTitle = title, DutyStartDate = start };
+            new(name, rank, title, start);
 
         private static void AssertClientException(ClientException? ex, HttpStatusCode status, string message)
         {

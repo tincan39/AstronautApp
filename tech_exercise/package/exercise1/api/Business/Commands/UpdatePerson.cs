@@ -7,12 +7,7 @@ using System.Net;
 
 namespace StargateAPI.Business.Commands
 {
-    public record UpdatePerson : IRequest
-    {
-        public required string Name { get; init; }
-
-        public required string NewName { get; init; }
-    }
+    public record UpdatePerson(string Name, string NewName) : IRequest;
 
     public class UpdatePersonPreProcessor : IRequestPreProcessor<UpdatePerson>
     {

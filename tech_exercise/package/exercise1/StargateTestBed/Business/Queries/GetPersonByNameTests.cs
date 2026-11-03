@@ -8,7 +8,7 @@ namespace StargateTestBed.Business.Queries
     public class GetPersonByNameTests : BaseTester
     {
         private Task<GetPersonByNameResult> SendAsync(string name) =>
-            new GetPersonByNameHandler(Context).Handle(new GetPersonByName { Name = name }, CancellationToken.None);
+            new GetPersonByNameHandler(Context).Handle(new GetPersonByName(name), CancellationToken.None);
 
         [Test]
         public async Task Handle_ExistingName_ReturnsPerson()

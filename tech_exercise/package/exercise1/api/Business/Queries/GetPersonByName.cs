@@ -7,10 +7,7 @@ using System.Net;
 
 namespace StargateAPI.Business.Queries
 {
-    public record GetPersonByName : IRequest<GetPersonByNameResult>
-    {
-        public required string Name { get; init; } = string.Empty;
-    }
+    public record GetPersonByName(string Name) : IRequest<GetPersonByNameResult>;
 
     public class GetPersonByNameHandler : IRequestHandler<GetPersonByName, GetPersonByNameResult>
     {

@@ -5,7 +5,7 @@ namespace StargateTestBed.Business.Queries
     public class GetAstronautDutiesByNameTests : BaseTester
     {
         private Task<GetAstronautDutiesByNameResult> SendAsync(string name) =>
-            new GetAstronautDutiesByNameHandler(Context).Handle(new GetAstronautDutiesByName { Name = name }, CancellationToken.None);
+            new GetAstronautDutiesByNameHandler(Context).Handle(new GetAstronautDutiesByName(name), CancellationToken.None);
 
         [Test]
         public async Task Handle_PersonWithDuties_ReturnsOnlyThatPersonsDuties()
