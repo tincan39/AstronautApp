@@ -69,11 +69,7 @@ export class PersonPage{
       takeUntilDestroyed()
     )
     .subscribe({
-      next: ([person, duties]) =>{
-        this.currPerson.set(person);
-        this.name.setValue(person.name);
-        this.astDuties.set(duties);
-      },
+      next: ([person, duties]) => this.setPersonAndDuties(person, duties),
       error: (err: HttpErrorResponse) =>
         this.statusMessage.set({ message: this.errorMessage(err, 'Could not load this person'), status: 'error' })
     })
@@ -92,9 +88,7 @@ export class PersonPage{
       .pipe(trackLoading(this.loadingService), takeUntilDestroyed(this.destroyRef))
       .subscribe({
         next:(res:Person) =>{
-          this.currPerson.set(res);
-          this.astDuties.set([]);
-          this.name.setValue(res.name);
+          this.setPersonAndDuties(res, []);
           this.statusMessage.set({ message: `Created ${res.name}`, status: 'success' });
         },
         error: (err: HttpErrorResponse) =>
@@ -144,15 +138,19 @@ export class PersonPage{
       )
       .subscribe({
         next: ([person, duties]) =>{
-          this.currPerson.set(person);
-          this.astDuties.set(duties);
-
+          this.setPersonAndDuties(person, duties);
           this.dutyFormDir()?.resetForm();
           this.dutyStatusMessage.set({ message: `Added duty ${dutyTitle.trim()}`, status: 'success' });
         },
         error: (err: HttpErrorResponse) =>
           this.dutyStatusMessage.set({ message: this.errorMessage(err, 'Could not add this duty'), status: 'error' })
       });
+  }
+
+  private setPersonAndDuties(person: Person, duties: AstronautDuty[]): void {
+    this.currPerson.set(person);
+    this.name.setValue(person.name);
+    this.astDuties.set(duties);
   }
 
   private errorMessage(err: HttpErrorResponse, fallback: string): string {

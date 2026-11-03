@@ -63,7 +63,7 @@ dotnet test --collect:"XPlat Code Coverage" --settings coverlet.runsettings
 reportgenerator -reports:"TestResults/*/coverage.cobertura.xml" -targetdir:"coverage-report" -reporttypes:Html
 ```
 
-Note: make sure to delete any prior test coverage report before running last two commands if you generated them
+Note: If you've generated any test coverage reports previously, delete them before running the last two commands
 
 See also:
 - [CHANGES.md](tech_exercise/package/exercise1/CHANGES.md): what was changed and why
