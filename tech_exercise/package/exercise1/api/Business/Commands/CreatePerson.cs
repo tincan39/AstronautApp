@@ -7,9 +7,9 @@ using StargateAPI.Business.Exceptions;
 
 namespace StargateAPI.Business.Commands
 {
-    public class CreatePerson : IRequest<CreatePersonResult>
+    public record CreatePerson : IRequest<CreatePersonResult>
     {
-        public required string Name { get; set; } = string.Empty;
+        public required string Name { get; init; } = string.Empty;
     }
 
     public class CreatePersonPreProcessor : IRequestPreProcessor<CreatePerson>

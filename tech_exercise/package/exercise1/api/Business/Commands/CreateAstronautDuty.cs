@@ -7,15 +7,15 @@ using System.Net;
 
 namespace StargateAPI.Business.Commands
 {
-    public class CreateAstronautDuty : IRequest
+    public record CreateAstronautDuty : IRequest
     {
-        public required string Name { get; set; }
+        public required string Name { get; init; }
 
-        public required string Rank { get; set; }
+        public required string Rank { get; init; }
 
-        public required string DutyTitle { get; set; }
+        public required string DutyTitle { get; init; }
 
-        public DateTime DutyStartDate { get; set; }
+        public DateTime DutyStartDate { get; init; }
     }
 
     public class CreateAstronautDutyPreProcessor : IRequestPreProcessor<CreateAstronautDuty>

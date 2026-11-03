@@ -5,10 +5,7 @@ using StargateAPI.Business.Dtos;
 
 namespace StargateAPI.Business.Queries
 {
-    public class GetPeople : IRequest<GetPeopleResult>
-    {
-
-    }
+    public record GetPeople : IRequest<GetPeopleResult>;
 
     public class GetPeopleHandler : IRequestHandler<GetPeople, GetPeopleResult>
     {
