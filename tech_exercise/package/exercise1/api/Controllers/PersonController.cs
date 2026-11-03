@@ -1,6 +1,7 @@
 ﻿using MediatR;
 using Microsoft.AspNetCore.Mvc;
 using StargateAPI.Business.Commands;
+using StargateAPI.Business.Dtos;
 using StargateAPI.Business.Queries;
 
 namespace StargateAPI.Controllers
